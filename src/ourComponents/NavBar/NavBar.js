@@ -66,7 +66,7 @@ function NavBar() {
                   dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]
                   hover:scale-110"
                 >
-                  <strong>Create New Tour</strong>
+                  <strong>Create A brand new Tour</strong>
                 </Link>
               </li>
             </ul>
