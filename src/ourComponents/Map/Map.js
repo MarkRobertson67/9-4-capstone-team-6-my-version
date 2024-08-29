@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 
 const google = window.google = window.google ? window.google : {}
 
+// Do I need activeMarker
 export default function Map({ pointsOfInterest, allPointsOfInterest, activeMarker }) {
 
   const [directionsResponse, setDirectionsResponse] = useState(null)
