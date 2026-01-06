@@ -24,9 +24,13 @@ export default function TourIndex() {
 
     useEffect(() => {
         axios.get(`${API}/tours`)
-            .then((res) => setTours(res.data))
-            .catch((e) => console.warn(e))
-    }, [])
+            .then((res) => {
+                console.log("API Response:", res.data); // Debugging response
+                setTours(res.data);
+            })
+            .catch((e) => console.warn("Error fetching tours:", e));
+    }, []);
+    
 
     useEffect(() => {
         if (tours.length > 0) {
