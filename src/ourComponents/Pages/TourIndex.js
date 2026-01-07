@@ -1,88 +1,170 @@
-import React, { useState, useEffect } from 'react';
-import TourCard from './TourCard';
-import axios from 'axios';
-import { motion } from 'framer-motion';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import axios from "axios";
+import { motion } from "framer-motion";
+import TourCard from "./TourCard";
 
 const API = process.env.REACT_APP_API_URL;
 
 export default function TourIndex() {
-    const [tours, setTours] = useState([])
-    const [expandedIndex, setExpandedIndex] = useState(null)
+  const [tours, setTours] = useState([]);
+  const [expandedIndex, setExpandedIndex] = useState(null);
 
-    const handleShowClick = (index) => {
-        setExpandedIndex(index === expandedIndex ? -1 : index)
-    }
+  // ref to the horizontal scroller
+  const scrollerRef = useRef(null);
 
-    const cardVariants = {
-        expanded: {
-            width: "900px"
-        },
-        collapsed: {
-            width: "170px"
-        }
-    }
+  // Protect seed tours (assumes seed tours are ids 1-5)
+  const isSeedTour = useMemo(() => {
+    const seedIds = new Set([1, 2, 3, 4, 5]);
+    return (tour) => seedIds.has(Number(tour.id));
+  }, []);
 
-    useEffect(() => {
-        axios.get(`${API}/tours`)
-            .then((res) => {
-                console.log("API Response:", res.data); // Debugging response
-                setTours(res.data);
-            })
-            .catch((e) => console.warn("Error fetching tours:", e));
-    }, []);
-    
+  useEffect(() => {
+    axios
+      .get(`${API}/tours`)
+      .then((res) => setTours(res.data))
+      .catch((e) => console.warn("Error fetching tours:", e));
+  }, []);
 
-    useEffect(() => {
-        if (tours.length > 0) {
-            console.log(tours);
-        }
-    }, [tours])
+  const handleShowClick = (index) => {
+    setExpandedIndex(index === expandedIndex ? null : index);
+  };
 
-    return (
-        <div>
-            <br></br>
-            <br></br>
-            <section className='pt-[150px] pb-[100px] gradient-day-to-night'>
-                <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-                    <h1 className='text-3xl font-extrabold luxury-font drop-shadow-lg'>
-                        Discover the World's Wonders
-                    </h1>
-                    <br />
-                    <h1 className='text-3xl font-light text-sky-950 drop-shadow-lg italic'>
-                        Our Prepackaged Tour Catalog
-                    </h1>
-                    <p className='mt-4 text-xl text-gray-300'></p>
+  // Keep your “expand/collapse” animation (but not 900px-wide — that breaks multi-panel layout)
+  const cardVariants = {
+  expanded: { width: 520 },
+  collapsed: { width: 224 },
+};
+
+
+  // Scroll by ~5 cards at a time
+  const scrollByCards = (direction = 1) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    // card width + gap (200 + 20)
+    const step = 224 * 5;
+    el.scrollBy({ left: step * direction, behavior: "smooth" });
+  };
+
+  const handleDelete = async (e, tourId) => {
+  // ✅ make stopPropagation optional (prevents crash)
+  if (e?.stopPropagation) e.stopPropagation();
+  if (e?.preventDefault) e.preventDefault();
+
+  try {
+    const res = await axios.delete(`${API}/tours/${tourId}`);
+    console.log("Deleted:", res.data);
+
+    setTours((prev) => prev.filter((t) => t.id !== tourId));
+  } catch (err) {
+    console.error("Delete failed:", err?.response?.data || err.message);
+    alert("Delete failed. Check console/network tab.");
+  }
+};
+
+
+  return (
+    <section className="gradient-day-to-night pt-[210px] pb-[100px]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-3xl font-extrabold luxury-font drop-shadow-lg">
+          Discover the World's Wonders
+        </h1>
+        <br />
+        <h2 className="text-3xl font-light text-sky-950 drop-shadow-lg italic">
+          Our Prepackaged Tour Catalog
+        </h2>
+      </div>
+
+      {/* Carousel wrapper MUST be relative so arrows position correctly */}
+      <div className="relative max-w-7xl mx-auto mt-12 px-4 sm:px-6 lg:px-8">
+        {/* Left arrow */}
+        <button
+          type="button"
+          onClick={() => scrollByCards(-1)}
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-30
+                     bg-white/80 hover:bg-white text-gray-900
+                     rounded-full w-12 h-12 shadow-lg
+                     flex items-center justify-center"
+          aria-label="Scroll left"
+        >
+          ‹
+        </button>
+
+        {/* Right arrow */}
+        <button
+          type="button"
+          onClick={() => scrollByCards(1)}
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-30
+                     bg-white/80 hover:bg-white text-gray-900
+                     rounded-full w-12 h-12 shadow-lg
+                     flex items-center justify-center"
+          aria-label="Scroll right"
+        >
+          ›
+        </button>
+
+        {/* Horizontal scroller */}
+        <div
+          ref={scrollerRef}
+          className="flex gap-5 overflow-x-auto overscroll-x-contain
+                     scroll-smooth snap-x snap-mandatory
+                     py-2 px-2
+                     [scrollbar-width:thin]"
+        >
+          {tours.map((tour, index) => {
+            const expanded = index === expandedIndex;
+
+            return (
+              <motion.div
+                key={tour.id}
+                className="relative snap-center flex-shrink-0 cursor-pointer
+                           h-[500px] bg-cover bg-center rounded-[20px]
+                           overflow-hidden"
+                variants={cardVariants}
+                initial="collapsed"
+                animate={expanded ? "expanded" : "collapsed"}
+                transition={{ duration: 0.45 }}
+                onClick={() => handleShowClick(index)}
+                style={{ backgroundImage: `url(${tour.image_url})` }}
+              >
+                {/* DELETE BUTTON (only if not seed) */}
+                {!isSeedTour(tour) && (
+                  <button
+                    type="button"
+                    onClick={(e) => handleDelete(e, tour.id)}
+                    className="absolute top-3 right-3 z-40
+                               bg-red-600/90 hover:bg-red-600 text-white
+                               text-xs font-bold px-3 py-2 rounded-lg shadow-lg"
+                    title="Delete tour"
+                  >
+                    Delete
+                  </button>
+                )}
+
+                {/* Footer overlay */}
+                <div className="h-full flex flex-col justify-end">
+                  <div className="rounded-b-[20px] bg-gray-800 bg-opacity-75 min-h-[110px] px-3 py-3 flex flex-col items-center justify-center">
+                    <h3 className="text-xl font-bold text-white text-center">
+                      {tour.city}
+                      {tour.state ? `, ${tour.state}` : ""}
+                      {tour.country ? `, ${tour.country}` : ""}
+                    </h3>
+
+                    {expanded && (
+                      <div
+                        className="mt-2 text-gray-200 text-center"
+                        onClick={(e) => e.stopPropagation()} // allow clicking link without collapsing
+                      >
+                        <TourCard tour={tour} />
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className='ml-8 mr-8 mt-12 flex flex-col md:flex-row justify-center items-center gap-5 overflow-x-auto overscroll-none'>
-                    {
-                        tours.map((tour, index) => {
-                            return <motion.div
-                                key={index}
-                                className={`card cursor-pointer h-[500px] bg-cover bg-center rounded-[20px] ${index === expandedIndex ? 'expanded' : ''}`}
-                                variants={cardVariants}
-                                initial='collapsed'
-                                animate={index === expandedIndex ? 'expanded' : 'collapsed'}
-                                transition={{ duration: 0.5 }}
-                                onClick={() => handleShowClick(index)}
-                                style={{
-                                    backgroundImage: `url(${tour.image_url})`,
-                                }}
-                            >
-                                <div className='card-content h-full flex flex-col justify-end'>
-                                    <div className='card-footer rounded-b-[20px] bg-gray-800 bg-opacity-75 min-h-[100px] flex flex-col items-center justify-center'>
-                                        <h1 className='text-xl font-bold text-white text-center'>{tour.city}, {tour.state ? `${tour.state},` : null} {tour.country}</h1>
-                                        {index === expandedIndex && (
-                                            <div className='mt-2 text-gray-300 text-center'>{<TourCard tour={tour} key={tour.id} />}</div>
-                                        )
-
-                                        }
-                                    </div>
-                                </div>
-                            </motion.div>
-                        })
-                    }
-                </div>
-            </section>
+              </motion.div>
+            );
+          })}
         </div>
-    )
+      </div>
+    </section>
+  );
 }
