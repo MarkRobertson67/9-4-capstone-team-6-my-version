@@ -9,7 +9,6 @@ export default function TourIndex() {
   const [tours, setTours] = useState([]);
   const [expandedIndex, setExpandedIndex] = useState(null);
 
-  // ref to the horizontal scroller
   const scrollerRef = useRef(null);
 
   // Protect seed tours (assumes seed tours are ids 1-5)
@@ -25,43 +24,67 @@ export default function TourIndex() {
       .catch((e) => console.warn("Error fetching tours:", e));
   }, []);
 
-  const handleShowClick = (index) => {
-    setExpandedIndex(index === expandedIndex ? null : index);
-  };
-
-  // Keep your “expand/collapse” animation (but not 900px-wide — that breaks multi-panel layout)
+  // Keep expand/collapse animation
   const cardVariants = {
-  expanded: { width: 520 },
-  collapsed: { width: 224 },
-};
-
+    expanded: { width: 520 },
+    collapsed: { width: 224 },
+  };
 
   // Scroll by ~5 cards at a time
   const scrollByCards = (direction = 1) => {
     const el = scrollerRef.current;
     if (!el) return;
-
-    // card width + gap (200 + 20)
     const step = 224 * 5;
     el.scrollBy({ left: step * direction, behavior: "smooth" });
   };
 
   const handleDelete = async (e, tourId) => {
-  // ✅ make stopPropagation optional (prevents crash)
-  if (e?.stopPropagation) e.stopPropagation();
-  if (e?.preventDefault) e.preventDefault();
+    if (e?.stopPropagation) e.stopPropagation();
+    if (e?.preventDefault) e.preventDefault();
 
-  try {
-    const res = await axios.delete(`${API}/tours/${tourId}`);
-    console.log("Deleted:", res.data);
+    try {
+      const res = await axios.delete(`${API}/tours/${tourId}`);
+      console.log("Deleted:", res.data);
+      setTours((prev) => prev.filter((t) => Number(t.id) !== Number(tourId)));
 
-    setTours((prev) => prev.filter((t) => t.id !== tourId));
-  } catch (err) {
-    console.error("Delete failed:", err?.response?.data || err.message);
-    alert("Delete failed. Check console/network tab.");
-  }
-};
+      // if we deleted the expanded one, close
+      setExpandedIndex((prev) => (prev === null ? null : prev));
+    } catch (err) {
+      console.error("Delete failed:", err?.response?.data || err.message);
+      alert("Delete failed. Check console/network tab.");
+    }
+  };
 
+  /**
+   * Ensure expanded card is fully visible in the scroller.
+   * This runs after the expand happens (we delay slightly so width animation starts).
+   */
+  const ensureCardFullyVisible = (cardEl) => {
+    const scroller = scrollerRef.current;
+    if (!scroller || !cardEl) return;
+
+    const sRect = scroller.getBoundingClientRect();
+    const cRect = cardEl.getBoundingClientRect();
+
+    // If card overflows left, scroll left
+    if (cRect.left < sRect.left) {
+      const delta = sRect.left - cRect.left + 16; // padding
+      scroller.scrollBy({ left: -delta, behavior: "smooth" });
+    }
+
+    // If card overflows right, scroll right
+    if (cRect.right > sRect.right) {
+      const delta = cRect.right - sRect.right + 16; // padding
+      scroller.scrollBy({ left: delta, behavior: "smooth" });
+    }
+  };
+
+  const handleShowClick = (index, cardEl) => {
+    setExpandedIndex((prev) => (prev === index ? null : index));
+
+    // After state change, wait a tick for layout/animation and then ensure visibility
+    setTimeout(() => ensureCardFullyVisible(cardEl), 180);
+  };
 
   return (
     <section className="gradient-day-to-night pt-[210px] pb-[100px]">
@@ -114,18 +137,23 @@ export default function TourIndex() {
           {tours.map((tour, index) => {
             const expanded = index === expandedIndex;
 
+            // If this is the last or 2nd-to-last card, snap it to the right
+            // so expansion feels like it grows leftward.
+            const nearEnd = index >= tours.length - 2;
+
             return (
               <motion.div
                 key={tour.id}
-                className="relative snap-center flex-shrink-0 cursor-pointer
+                className={`relative snap-center flex-shrink-0 cursor-pointer
                            h-[500px] bg-cover bg-center rounded-[20px]
-                           overflow-hidden"
+                           overflow-hidden ${nearEnd ? "snap-end" : ""}`}
                 variants={cardVariants}
                 initial="collapsed"
                 animate={expanded ? "expanded" : "collapsed"}
                 transition={{ duration: 0.45 }}
-                onClick={() => handleShowClick(index)}
                 style={{ backgroundImage: `url(${tour.image_url})` }}
+                // use currentTarget so we can pass the element to ensureCardFullyVisible
+                onClick={(e) => handleShowClick(index, e.currentTarget)}
               >
                 {/* DELETE BUTTON (only if not seed) */}
                 {!isSeedTour(tour) && (

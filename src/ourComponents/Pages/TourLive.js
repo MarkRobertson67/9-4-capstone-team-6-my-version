@@ -57,7 +57,7 @@ export default function Tour() {
             <div className='max-[760px]:pt-[180px]max-[760px]:flex tourLive ml-0 mt-[-30px]'>
 
                 <div className="relative h-10 w-[200px] ...">
-                    <button className="absolute inline-flex ml-[80px] mt-[40px] left-0 top-0 h-16 w-[200px] font-extrabold text-sky-950 ..."><Link className="inline-flex" to='/tours'>{<TiArrowBack />} ALL TOURS</Link></button>
+                    <button className="absolute inline-flex ml-[80px] mt-[55px] left-0 top-0 h-16 w-[200px] font-extrabold text-sky-950 ..."><Link className="inline-flex" to='/tours'>{<TiArrowBack />} ALL TOURS</Link></button>
                 </div>
                 <div className="flex flex-col  items-center h-screen pt-4 ">
                     <h1 className='mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl text-transparent bg-clip-text bg-gradient-to-r to-cyan-600 from-sky-950'>{tour.city}, {tour.state ? `${tour.state.toUpperCase()},` : null} {tour.country}</h1>
