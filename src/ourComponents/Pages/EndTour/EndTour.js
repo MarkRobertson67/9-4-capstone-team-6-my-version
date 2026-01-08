@@ -1,7 +1,7 @@
 // src/ourComponents/Pages/EndTour/EndTour.js
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import emailjs from "@emailjs/browser"; // ✅ modern package
+import emailjs from "@emailjs/browser";
 
 import AnimatedLogo from "../../../assets/City_Whisperer_Animation_LargeDashes.mp4";
 import StarEmpty from "../../../assets/endTourPhotos/empty-star-icon.png";
@@ -16,31 +16,26 @@ export default function EndTour() {
 
   // video/audio
   const videoRef = useRef(null);
-  const [videoMuted, setVideoMuted] = useState(false); // ✅ "want sound auto enables" (best possible)
+  const [videoMuted, setVideoMuted] = useState(false);
 
-  // feedback form
+  // form
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [userEmail, setUserEmail] = useState(""); // ✅ user can add email for response
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [sending, setSending] = useState(false);
-  const [userName, setUserName] = useState("");
 
-  // ✅ Autoplay policy workaround:
-  // - video autoplays immediately
-  // - audio will only become unmuted after the FIRST user interaction (browser rule)
+  // Try to unlock audio on first user interaction (browser autoplay rules)
   useEffect(() => {
     const unlockAudio = async () => {
       if (!videoRef.current) return;
 
       try {
-        // If user hasn't explicitly muted, unmute + play on first click
-        if (!videoMuted) {
-          videoRef.current.muted = false;
-        }
+        if (!videoMuted) videoRef.current.muted = false;
         await videoRef.current.play();
       } catch {
-        // ignore (some browsers still block until interaction, but this handler *is* the interaction)
+        // ignore
       } finally {
         document.removeEventListener("click", unlockAudio);
         document.removeEventListener("touchstart", unlockAudio);
@@ -60,11 +55,9 @@ export default function EndTour() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Keep the DOM video muted flag in sync with state
+  // Keep DOM muted flag in sync
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.muted = videoMuted;
-    }
+    if (videoRef.current) videoRef.current.muted = videoMuted;
   }, [videoMuted]);
 
   const renderStars = () => {
@@ -83,73 +76,80 @@ export default function EndTour() {
   };
 
   const handleSubmit = async () => {
-  if (!message.trim() || rating === 0) {
-    alert("Please leave a message and rating.");
-    return;
-  }
+    if (sending) return;
 
-  const cleanedEmail = userEmail.trim();
-
-  // If provided, validate it
-  if (cleanedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanedEmail)) {
-    alert("Please enter a valid email address (or leave it blank).");
-    return;
-  }
-
-  if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
-    alert(
-      "Email is not configured. Missing EmailJS env vars. Check .env and restart the dev server."
-    );
-    return;
-  }
-
-  setSending(true);
-
-  const templateParams = {
-    source: "City Whisperer Tour Feedback",
-    rating: `${rating}/5`,
-    name: userName.trim() || "there",
-    time: new Date().toLocaleString(),
-
-    // ✅ MUST be a real email or empty string
-    email: cleanedEmail, // "" if blank
-
-    message: message.trim(),
-  };
-
-  try {
-    await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
-
-    alert("Thank you! Your feedback has been sent.");
-
-    // stop any audio
-    if (videoRef.current) {
-      try {
-        videoRef.current.pause();
-      } catch {}
+    if (!message.trim() || rating === 0) {
+      alert("Please leave a message and rating.");
+      return;
     }
 
-    // clear state
-    setMessage("");
-    setUserEmail("");
-    setRating(0);
-    setHoverRating(0);
+    const cleanedEmail = userEmail.trim();
+    const cleanedName = userName.trim();
 
-    navigate("/tours");
-  } catch (err) {
-    console.error("EmailJS error:", err);
-    alert("Something went wrong sending your message. Please try again.");
-  } finally {
-    setSending(false);
-  }
-};
+    // If provided, validate email
+    if (cleanedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanedEmail)) {
+      alert("Please enter a valid email address (or leave it blank).");
+      return;
+    }
 
+    if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
+      alert("EmailJS is not configured. Check env vars and restart dev server.");
+      return;
+    }
+
+    setSending(true);
+
+    // IMPORTANT:
+    // - email MUST be a real email OR empty string
+    // - name should be user’s name (or fallback)
+    // - brand/logo vars are for your template conditional logo setup
+    const templateParams = {
+      source: "City Whisperer Tour Feedback",
+      rating: `${rating}/5`,
+      name: cleanedName || "there",
+      time: new Date().toLocaleString(),
+      email: cleanedEmail || "", // ✅ empty string if blank (auto-reply won’t send if empty)
+      message: message.trim(),
+
+      // ✅ conditional branding variables (used by your template)
+      brand_name: "City Whisperer",
+      // Use a PUBLIC URL, not cid: and not /public local file
+      logo_url: "https://citywhisperer-mark.netlify.app/CityWhispererLogo.png",
+      logo_display: "block",
+    };
+
+    try {
+      await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
+
+      // stop audio/video
+      if (videoRef.current) {
+        try {
+          videoRef.current.pause();
+        } catch {}
+      }
+
+      // clear state
+      setUserName("");
+      setUserEmail("");
+      setMessage("");
+      setRating(0);
+      setHoverRating(0);
+
+      // ✅ CLOSE the modal/page
+      navigate("/tours");
+    } catch (err) {
+      console.error("EmailJS error:", err);
+      alert("Something went wrong sending your message. Please try again.");
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <div className="no-content-container mt-36 sm:mt-32 md:mt-60 lg:mt-36 xl:mt-36 pb-8 sm:pb-16 md:pb-24 lg:pb-16 xl:pb-16">
       <div className="fixed inset-0 flex items-center justify-center z-50">
         <div className="bg-amber-300 w-3/4 md:w-1/2 lg:w-1/3 p-4 rounded-lg shadow-xl">
-          {/* VIDEO + AUDIO */}
+          {/* VIDEO */}
           <div className="mb-4">
             <video
               ref={videoRef}
@@ -173,7 +173,7 @@ export default function EndTour() {
             </div>
 
             <p className="text-xs text-gray-700 mt-2">
-              Note: If sound doesn’t start immediately, click anywhere once (browser autoplay rule).
+              Note: If sound doesn’t start immediately, click once anywhere (browser autoplay rule).
             </p>
           </div>
 
@@ -181,7 +181,7 @@ export default function EndTour() {
             Safe travels! Thank you for exploring with us ✨
           </p>
 
-          <div className="star-container flex items-center justify-center mt-1 mb-2">
+          <div className="flex items-center justify-center mt-1 mb-2">
             {renderStars()}
           </div>
 
@@ -191,14 +191,12 @@ export default function EndTour() {
           </div>
 
           <input
-  className="w-full p-2 border rounded-md mb-2"
-  placeholder="Your name (optional)"
-  value={userName}
-  onChange={(e) => setUserName(e.target.value)}
-/>
+            className="w-full p-2 border rounded-md mb-2"
+            placeholder="Your name (optional)"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+          />
 
-
-          {/* Optional user email */}
           <input
             className="w-full p-2 border rounded-md mb-2"
             placeholder="Your email (optional — if you want a response)"
