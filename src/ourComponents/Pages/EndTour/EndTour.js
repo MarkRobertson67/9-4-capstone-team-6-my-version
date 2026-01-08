@@ -86,7 +86,6 @@ export default function EndTour() {
     const cleanedEmail = userEmail.trim();
     const cleanedName = userName.trim();
 
-    // If provided, validate email
     if (cleanedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanedEmail)) {
       alert("Please enter a valid email address (or leave it blank).");
       return;
@@ -99,21 +98,15 @@ export default function EndTour() {
 
     setSending(true);
 
-    // IMPORTANT:
-    // - email MUST be a real email OR empty string
-    // - name should be user’s name (or fallback)
-    // - brand/logo vars are for your template conditional logo setup
     const templateParams = {
       source: "City Whisperer Tour Feedback",
       rating: `${rating}/5`,
       name: cleanedName || "there",
       time: new Date().toLocaleString(),
-      email: cleanedEmail || "", // ✅ empty string if blank (auto-reply won’t send if empty)
+      email: cleanedEmail || "",
       message: message.trim(),
 
-      // ✅ conditional branding variables (used by your template)
       brand_name: "City Whisperer",
-      // Use a PUBLIC URL, not cid: and not /public local file
       logo_url: "https://citywhisperer-mark.netlify.app/CityWhispererLogo.png",
       logo_display: "block",
     };
@@ -121,21 +114,21 @@ export default function EndTour() {
     try {
       await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
 
-      // stop audio/video
+      // ✅ bring back success alert
+      alert("Thank you! Your feedback has been sent.");
+
       if (videoRef.current) {
         try {
           videoRef.current.pause();
         } catch {}
       }
 
-      // clear state
       setUserName("");
       setUserEmail("");
       setMessage("");
       setRating(0);
       setHoverRating(0);
 
-      // ✅ CLOSE the modal/page
       navigate("/tours");
     } catch (err) {
       console.error("EmailJS error:", err);
@@ -149,7 +142,6 @@ export default function EndTour() {
     <div className="no-content-container mt-36 sm:mt-32 md:mt-60 lg:mt-36 xl:mt-36 pb-8 sm:pb-16 md:pb-24 lg:pb-16 xl:pb-16">
       <div className="fixed inset-0 flex items-center justify-center z-50">
         <div className="bg-amber-300 w-3/4 md:w-1/2 lg:w-1/3 p-4 rounded-lg shadow-xl">
-          {/* VIDEO */}
           <div className="mb-4">
             <video
               ref={videoRef}
