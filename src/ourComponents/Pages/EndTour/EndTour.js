@@ -1,104 +1,226 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import '../EndTour/EndTour.css';
-import AnimatedLogo from '../../../assets/City_Whisperer_Animation_LargeDashes.mp4';
-import StarEmpty from '../../../assets/endTourPhotos/empty-star-icon.png';
-import StarFilled from '../../../assets/endTourPhotos/full-star-icon.png';
+// src/ourComponents/Pages/EndTour/EndTour.js
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import emailjs from "@emailjs/browser"; // ✅ modern package
+import AnimatedLogo from "../../../assets/City_Whisperer_Animation_LargeDashes.mp4";
+import StarEmpty from "../../../assets/endTourPhotos/empty-star-icon.png";
+import StarFilled from "../../../assets/endTourPhotos/full-star-icon.png";
 
-const EndTour = () => {
-  const [userMessage, setUserMessage] = useState({
-    message: '',
-  });
+const SERVICE_ID = process.env.REACT_APP_EMAILJS_SERVICE_ID;
+const TEMPLATE_ID = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
+const PUBLIC_KEY = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
 
+export default function EndTour() {
+  const navigate = useNavigate();
+
+  // video/audio
+  const videoRef = useRef(null);
+  const [videoMuted, setVideoMuted] = useState(false); // ✅ "want sound auto enables" (best possible)
+
+  // feedback form
+  const [message, setMessage] = useState("");
+  const [userEmail, setUserEmail] = useState(""); // ✅ user can add email for response
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
+  const [sending, setSending] = useState(false);
 
-  const handleTextChange = (event) => {
-    setUserMessage({ ...userMessage, message: event.target.value });
-  };
+  // ✅ Autoplay policy workaround:
+  // - video autoplays immediately
+  // - audio will only become unmuted after the FIRST user interaction (browser rule)
+  useEffect(() => {
+    const unlockAudio = async () => {
+      if (!videoRef.current) return;
 
-  const handleRatingChange = (newRating) => {
-    setRating(newRating);
-  };
+      try {
+        // If user hasn't explicitly muted, unmute + play on first click
+        if (!videoMuted) {
+          videoRef.current.muted = false;
+        }
+        await videoRef.current.play();
+      } catch {
+        // ignore (some browsers still block until interaction, but this handler *is* the interaction)
+      } finally {
+        document.removeEventListener("click", unlockAudio);
+        document.removeEventListener("touchstart", unlockAudio);
+        document.removeEventListener("keydown", unlockAudio);
+      }
+    };
 
-  const handleHoverRating = (hoveredRating) => {
-    setHoverRating(hoveredRating);
-  };
+    document.addEventListener("click", unlockAudio);
+    document.addEventListener("touchstart", unlockAudio);
+    document.addEventListener("keydown", unlockAudio);
 
-  const renderStarImages = () => {
-    const starImages = [];
-    // const starSize = '24px';
-    const maxRating = Math.max(rating, hoverRating);
+    return () => {
+      document.removeEventListener("click", unlockAudio);
+      document.removeEventListener("touchstart", unlockAudio);
+      document.removeEventListener("keydown", unlockAudio);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    for (let i = 1; i <= 5; i++) {
-      starImages.push(
-        <img
-          key={i}
-          src={i <= maxRating ? StarFilled : StarEmpty}
-          alt={`Star ${i}`}
-          className="w-6 h-6 cursor-pointer"
-          onClick={() => handleRatingChange(i)}
-          onMouseEnter={() => handleHoverRating(i)}
-          onMouseLeave={() => handleHoverRating(0)}
-        />
-      );
+  // Keep the DOM video muted flag in sync with state
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = videoMuted;
     }
-    return starImages;
+  }, [videoMuted]);
+
+  const renderStars = () => {
+    const max = Math.max(rating, hoverRating);
+    return Array.from({ length: 5 }, (_, i) => (
+      <img
+        key={i}
+        src={i + 1 <= max ? StarFilled : StarEmpty}
+        className="w-6 h-6 cursor-pointer"
+        alt={`Star ${i + 1}`}
+        onClick={() => setRating(i + 1)}
+        onMouseEnter={() => setHoverRating(i + 1)}
+        onMouseLeave={() => setHoverRating(0)}
+      />
+    ));
+  };
+
+  const handleSubmit = async () => {
+    if (!message.trim() || rating === 0) {
+      alert("Please leave a message and rating.");
+      return;
+    }
+
+    // Optional email: if provided, basic validation
+    if (userEmail.trim() && !/^\S+@\S+\.\S+$/.test(userEmail.trim())) {
+      alert("Please enter a valid email address (or leave it blank).");
+      return;
+    }
+
+    if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
+      alert(
+        "Email is not configured. Missing EmailJS env vars. Check .env and restart the dev server."
+      );
+      return;
+    }
+
+    setSending(true);
+
+    // ✅ Match your EmailJS template variables:
+    // {{name}}, {{time}}, {{email}}, {{message}}
+    // Add extra ones if you want: {{source}}, {{rating}}
+    const templateParams = {
+      source: "City Whisperer Tour Feedback",
+      rating: `${rating}/5`,
+      name: "City Whisperer User",
+      time: new Date().toLocaleString(),
+      email: userEmail.trim() || "Not provided",
+      message: message.trim(),
+    };
+
+    try {
+      await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
+
+      alert("Thank you! Your feedback has been sent.");
+
+      // stop any audio
+      if (videoRef.current) {
+        try {
+          videoRef.current.pause();
+        } catch {}
+      }
+
+      // clear state
+      setMessage("");
+      setUserEmail("");
+      setRating(0);
+      setHoverRating(0);
+
+      // ✅ close modal / leave page after send
+      navigate("/tours");
+    } catch (err) {
+      console.error("EmailJS error:", err);
+      alert("Something went wrong sending your message. Please try again.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
     <div className="no-content-container mt-36 sm:mt-32 md:mt-60 lg:mt-36 xl:mt-36 pb-8 sm:pb-16 md:pb-24 lg:pb-16 xl:pb-16">
       <div className="fixed inset-0 flex items-center justify-center z-50">
         <div className="bg-amber-300 w-3/4 md:w-1/2 lg:w-1/3 p-4 rounded-lg shadow-xl">
+          {/* VIDEO + AUDIO */}
           <div className="mb-4">
-            <video className="w-full" controls autoPlay volume={0.5}>
+            <video
+              ref={videoRef}
+              className="w-full rounded-lg"
+              autoPlay
+              loop
+              muted={videoMuted}
+              playsInline
+            >
               <source src={AnimatedLogo} type="video/mp4" />
             </video>
-          </div>
 
-          <div className="mb-4">
-            <p className="text-lg font-semibold mb-2">
-              Safe travels! Thank you for exploring with us!
-            </p>
-            {/* <div className="text-gray-600 text-sm font-semibold">
-              Please rate us
-            </div> */}
-            <div className="star-container flex items-center justify-center mt-1 mb-2">
-              {renderStarImages()}
-            </div>
-            <div className="text-gray-600 text-xs mb-2">
-              <span>1 - Poor</span> | <span>2 - Fair</span> | <span>3 - Average</span> | <span>4 - Very Good</span> | <span>5 - Excellent</span>
-            </div>
-            {/* <p className="text-gray-600 text-sm mb-2 mt-2 font-semibold text-center">
-              Tell us what you liked and how we can improve:
-            </p> */}
-            <textarea
-              className="w-full p-2 border rounded-md"
-              rows={5}
-              onChange={handleTextChange}
-              value={userMessage.message}
-              placeholder="Write here to tell us what you liked and how we can improve."
-              required
-            />
-          </div>
-
-          <div className="text-right">
-            {/* Use Link to navigate to /tours -could decide to change route to /home once decided with team*/}
-            <Link to="/tours">
+            <div className="flex justify-end mt-2">
               <button
-                className="inline-block rounded bg-[#E36E43] px-6 py-2 text-xs font-bold text-[#dbd4db] uppercase leading-normal transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] hover:scale-110"
-                onClick={() => {
-                  // Handle sending the user message and rating, might change if decide to keep rating stored
-                }}
+                type="button"
+                onClick={() => setVideoMuted((m) => !m)}
+                className="text-sm underline text-gray-700"
               >
-                Submit
+                {videoMuted ? "Unmute 🔊" : "Mute 🔇"}
+              </button>
+            </div>
+
+            <p className="text-xs text-gray-700 mt-2">
+              Note: If sound doesn’t start immediately, click anywhere once (browser autoplay rule).
+            </p>
+          </div>
+
+          <p className="text-lg font-semibold mb-2 text-center">
+            Safe travels! Thank you for exploring with us ✨
+          </p>
+
+          <div className="star-container flex items-center justify-center mt-1 mb-2">
+            {renderStars()}
+          </div>
+
+          <div className="text-gray-600 text-xs mb-2 text-center">
+            <span>1 - Poor</span> | <span>2 - Fair</span> | <span>3 - Average</span> |{" "}
+            <span>4 - Very Good</span> | <span>5 - Excellent</span>
+          </div>
+
+          {/* Optional user email */}
+          <input
+            className="w-full p-2 border rounded-md mb-2"
+            placeholder="Your email (optional — if you want a response)"
+            value={userEmail}
+            onChange={(e) => setUserEmail(e.target.value)}
+          />
+
+          <textarea
+            className="w-full p-2 border rounded-md"
+            rows={5}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Write here to tell us what you liked and how we can improve."
+            required
+          />
+
+          <div className="flex justify-between items-center mt-4">
+            <Link to="/tours">
+              <button className="text-sm text-gray-700 underline" type="button">
+                Skip
               </button>
             </Link>
+
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={sending}
+              className="inline-block rounded bg-[#E36E43] px-6 py-2 text-xs font-bold text-white uppercase leading-normal transition duration-150 ease-in-out hover:scale-110 disabled:opacity-50"
+            >
+              {sending ? "Sending..." : "Submit"}
+            </button>
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
-};
-
-export default EndTour;
+}
