@@ -1,3 +1,4 @@
+// src/ourComponents/Pages/TourIndex.js
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
@@ -30,12 +31,13 @@ export default function TourIndex() {
     collapsed: { width: 224 },
   };
 
-  // Scroll by ~5 cards at a time
+  // Arrow scroll by ~5 cards
   const scrollByCards = (direction = 1) => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const step = 224 * 5;
-    el.scrollBy({ left: step * direction, behavior: "smooth" });
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+
+    const step = 224 * 5; // collapsedWidth * 5
+    scroller.scrollBy({ left: step * direction, behavior: "smooth" });
   };
 
   const handleDelete = async (e, tourId) => {
@@ -45,10 +47,10 @@ export default function TourIndex() {
     try {
       const res = await axios.delete(`${API}/tours/${tourId}`);
       console.log("Deleted:", res.data);
-      setTours((prev) => prev.filter((t) => Number(t.id) !== Number(tourId)));
 
-      // if we deleted the expanded one, close
-      setExpandedIndex((prev) => (prev === null ? null : prev));
+      setTours((prev) => prev.filter((t) => Number(t.id) !== Number(tourId)));
+      // Close expansion (simplest; avoids edge cases if you delete expanded)
+      setExpandedIndex(null);
     } catch (err) {
       console.error("Delete failed:", err?.response?.data || err.message);
       alert("Delete failed. Check console/network tab.");
@@ -56,8 +58,8 @@ export default function TourIndex() {
   };
 
   /**
-   * Ensure expanded card is fully visible in the scroller.
-   * This runs after the expand happens (we delay slightly so width animation starts).
+   * Smoothly scroll JUST ENOUGH so card is fully visible.
+   * Does NOT center (only fixes overflow on either side).
    */
   const ensureCardFullyVisible = (cardEl) => {
     const scroller = scrollerRef.current;
@@ -66,24 +68,43 @@ export default function TourIndex() {
     const sRect = scroller.getBoundingClientRect();
     const cRect = cardEl.getBoundingClientRect();
 
-    // If card overflows left, scroll left
-    if (cRect.left < sRect.left) {
-      const delta = sRect.left - cRect.left + 16; // padding
+    const leftBuffer = 24;
+    const rightBuffer = 24;
+
+    const viewLeft = sRect.left;
+    const viewRight = sRect.right;
+
+    const cardLeft = cRect.left;
+    const cardRight = cRect.right;
+
+    // If card is clipped on the LEFT, scroll left just enough
+    if (cardLeft < viewLeft + leftBuffer) {
+      const delta = (viewLeft + leftBuffer) - cardLeft;
       scroller.scrollBy({ left: -delta, behavior: "smooth" });
     }
 
-    // If card overflows right, scroll right
-    if (cRect.right > sRect.right) {
-      const delta = cRect.right - sRect.right + 16; // padding
+    // If card is clipped on the RIGHT, scroll right just enough
+    if (cardRight > viewRight - rightBuffer) {
+      const delta = cardRight - (viewRight - rightBuffer);
       scroller.scrollBy({ left: delta, behavior: "smooth" });
     }
   };
 
+  /**
+   * Expanding animates width over ~450ms.
+   * If we check only once, it can be jittery.
+   * So we re-check a few times while the animation runs.
+   */
+  const ensureDuringAnimation = (cardEl) => {
+    const times = [0, 120, 240, 360, 480];
+    times.forEach((ms) => {
+      setTimeout(() => ensureCardFullyVisible(cardEl), ms);
+    });
+  };
+
   const handleShowClick = (index, cardEl) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
-
-    // After state change, wait a tick for layout/animation and then ensure visibility
-    setTimeout(() => ensureCardFullyVisible(cardEl), 180);
+    ensureDuringAnimation(cardEl);
   };
 
   return (
@@ -137,22 +158,17 @@ export default function TourIndex() {
           {tours.map((tour, index) => {
             const expanded = index === expandedIndex;
 
-            // If this is the last or 2nd-to-last card, snap it to the right
-            // so expansion feels like it grows leftward.
-            const nearEnd = index >= tours.length - 2;
-
             return (
               <motion.div
                 key={tour.id}
-                className={`relative snap-center flex-shrink-0 cursor-pointer
+                className="relative snap-start flex-shrink-0 cursor-pointer
                            h-[500px] bg-cover bg-center rounded-[20px]
-                           overflow-hidden ${nearEnd ? "snap-end" : ""}`}
+                           overflow-hidden"
                 variants={cardVariants}
                 initial="collapsed"
                 animate={expanded ? "expanded" : "collapsed"}
                 transition={{ duration: 0.45 }}
                 style={{ backgroundImage: `url(${tour.image_url})` }}
-                // use currentTarget so we can pass the element to ensureCardFullyVisible
                 onClick={(e) => handleShowClick(index, e.currentTarget)}
               >
                 {/* DELETE BUTTON (only if not seed) */}
