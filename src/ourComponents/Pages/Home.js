@@ -4,8 +4,7 @@ import video2 from "../../assets/Page2_WebPage_Landscape.mp4";
 import image1 from "../../assets/travelPhotos/cristina-gottardi--YzMZYqwoH4-unsplash (1).jpg";
 import image2 from "../../assets/travelPhotos/dan-novac-1naE8177_bI-unsplash.jpg";
 import image3 from "../../assets/travelPhotos/bjorn-agerbeek-ak8uY9rVDOs-unsplash.jpg";
-import image4 from "../../assets/travelPhotos/timo-stern-iUBgeNeyVy8-unsplash.jpg"
-
+import image4 from "../../assets/travelPhotos/timo-stern-iUBgeNeyVy8-unsplash.jpg";
 
 // import image4 from "../../assets/travelPhotos/dan-novac-1naE8177_bI-unsplash.jpg";
 // import image5 from "../../assets/travelPhotos/billy-huynh-v9bnfMCyKbg-unsplash.jpg"
@@ -62,9 +61,20 @@ export default function Home() {
             data-te-carousel-item
             data-te-carousel-active
           >
-            <video className="w-full" controls autoPlay loop volume={0.5}>
-              <source src={video1} type="video/mp4" />
-            </video>
+            <div className="relative h-[100vh] w-full overflow-hidden">
+              <video
+                className="h-full w-full object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                controls
+              >
+                <source src={video1} type="video/mp4" />
+              </video>
+            </div>
+
             <div className="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-white md:block">
               {/* <h5 class="text-xl">First slide label</h5> */}
               {/* <p>Some representative placeholder content for the first slide.</p> */}
@@ -75,9 +85,20 @@ export default function Home() {
             data-te-carousel-fade
             data-te-carousel-item
           >
-            <video className="w-full" autoPlay loop volume={0.5}>
-              <source src={video2} type="video/mp4" />
-            </video>
+            <div className="relative h-[100vh] w-full overflow-hidden">
+              <video
+                className="h-full w-full object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                controls
+              >
+                <source src={video2} type="video/mp4" />
+              </video>
+            </div>
+
             <div className="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-white md:block">
               {/* <h5 class="text-xl">Second slide label</h5> */}
               {/* <p>Some representative placeholder content for the second slide.</p> */}
@@ -180,10 +201,11 @@ export default function Home() {
 
         <div className="">
           <div className="absolute bottom-40 text-3xl max-[760px]:text-xl mx-40 px-14 py-10 max-[760px]:mx-5 max-[760px]:py-5 text-[#183759] rounded-lg bg-[#e8e2eac7] font-normal max-[760px]:mt-0 shadow-md font-serif">
-            Discover hidden gems and explore iconic landmarks like a local. Our ChatGPT-powered virtual tour guide will chat with you, offering recommendations, historical tidbits, and insider tips along the way
+            Discover hidden gems and explore iconic landmarks like a local. Our
+            ChatGPT-powered virtual tour guide will chat with you, offering
+            recommendations, historical tidbits, and insider tips along the way
           </div>
         </div>
-
       </div>
 
       {/* partition 3 */}
@@ -202,16 +224,24 @@ export default function Home() {
       </div>
 
       {/* partition 4 */}
-      <div className="h-screen pt-20">
+      <div className="h-screen pt-0">
         <div className="bg-blackbg h-5/6 max-[760px]:h-5/6 max-[760px]:w-screen mt-[15%] max-[760px]: mx-40 max-[760px]:mx-0 max-[760px]:r-0 rounded-3xl shadow-2xl">
-          <img src={image4} alt="FindYourWay" className="w-1/4 max-[760px]:w-2/4 object-center inline-block rounded-lg mt-[3%]" />
-          <div className="mx-[12%] my-[3%] max-[760px]:mx-[0] 
-          max-[760px]:mt-14 text-[#ffffff] font-serif text-3xl font-medium">
-            Embark on endless journeys with <span className="text-[#295583] font-semibold">CityWhisperer</span> and let your curiosity guide you. Join us in discovering the world, one step at a time.
+          <img
+            src={image4}
+            alt="FindYourWay"
+            className="w-1/4 max-[760px]:w-2/4 object-center inline-block rounded-lg mt-[3%]"
+          />
+          <div
+            className="mx-[12%] my-[3%] max-[760px]:mx-[0] 
+          max-[760px]:mt-38 text-[#ffffff] font-serif text-3xl font-medium"
+          >
+            Embark on endless journeys with{" "}
+            <span className="text-[#295583] font-semibold">CityWhisperer</span>{" "}
+            and let your curiosity guide you. Join us in discovering the world,
+            one step at a time.
           </div>
         </div>
       </div>
-
     </div>
   );
 }
