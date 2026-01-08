@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import emailjs from "@emailjs/browser"; // ✅ modern package
+
 import AnimatedLogo from "../../../assets/City_Whisperer_Animation_LargeDashes.mp4";
 import StarEmpty from "../../../assets/endTourPhotos/empty-star-icon.png";
 import StarFilled from "../../../assets/endTourPhotos/full-star-icon.png";
@@ -81,65 +82,67 @@ export default function EndTour() {
   };
 
   const handleSubmit = async () => {
-    if (!message.trim() || rating === 0) {
-      alert("Please leave a message and rating.");
-      return;
-    }
+  if (!message.trim() || rating === 0) {
+    alert("Please leave a message and rating.");
+    return;
+  }
 
-    // Optional email: if provided, basic validation
-    if (userEmail.trim() && !/^\S+@\S+\.\S+$/.test(userEmail.trim())) {
-      alert("Please enter a valid email address (or leave it blank).");
-      return;
-    }
+  const cleanedEmail = userEmail.trim();
 
-    if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
-      alert(
-        "Email is not configured. Missing EmailJS env vars. Check .env and restart the dev server."
-      );
-      return;
-    }
+  // If provided, validate it
+  if (cleanedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanedEmail)) {
+    alert("Please enter a valid email address (or leave it blank).");
+    return;
+  }
 
-    setSending(true);
+  if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
+    alert(
+      "Email is not configured. Missing EmailJS env vars. Check .env and restart the dev server."
+    );
+    return;
+  }
 
-    // ✅ Match your EmailJS template variables:
-    // {{name}}, {{time}}, {{email}}, {{message}}
-    // Add extra ones if you want: {{source}}, {{rating}}
-    const templateParams = {
-      source: "City Whisperer Tour Feedback",
-      rating: `${rating}/5`,
-      name: "City Whisperer User",
-      time: new Date().toLocaleString(),
-      email: userEmail.trim() || "Not provided",
-      message: message.trim(),
-    };
+  setSending(true);
 
-    try {
-      await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
+  const templateParams = {
+    source: "City Whisperer Tour Feedback",
+    rating: `${rating}/5`,
+    name: "City Whisperer User",
+    time: new Date().toLocaleString(),
 
-      alert("Thank you! Your feedback has been sent.");
+    // ✅ MUST be a real email or empty string
+    email: cleanedEmail, // "" if blank
 
-      // stop any audio
-      if (videoRef.current) {
-        try {
-          videoRef.current.pause();
-        } catch {}
-      }
-
-      // clear state
-      setMessage("");
-      setUserEmail("");
-      setRating(0);
-      setHoverRating(0);
-
-      // ✅ close modal / leave page after send
-      navigate("/tours");
-    } catch (err) {
-      console.error("EmailJS error:", err);
-      alert("Something went wrong sending your message. Please try again.");
-    } finally {
-      setSending(false);
-    }
+    message: message.trim(),
   };
+
+  try {
+    await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
+
+    alert("Thank you! Your feedback has been sent.");
+
+    // stop any audio
+    if (videoRef.current) {
+      try {
+        videoRef.current.pause();
+      } catch {}
+    }
+
+    // clear state
+    setMessage("");
+    setUserEmail("");
+    setRating(0);
+    setHoverRating(0);
+
+    navigate("/tours");
+  } catch (err) {
+    console.error("EmailJS error:", err);
+    alert("Something went wrong sending your message. Please try again.");
+  } finally {
+    setSending(false);
+  }
+};
+
 
   return (
     <div className="no-content-container mt-36 sm:mt-32 md:mt-60 lg:mt-36 xl:mt-36 pb-8 sm:pb-16 md:pb-24 lg:pb-16 xl:pb-16">
