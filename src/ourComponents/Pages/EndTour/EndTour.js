@@ -24,6 +24,7 @@ export default function EndTour() {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [sending, setSending] = useState(false);
+  const [userName, setUserName] = useState("");
 
   // ✅ Autoplay policy workaround:
   // - video autoplays immediately
@@ -107,7 +108,7 @@ export default function EndTour() {
   const templateParams = {
     source: "City Whisperer Tour Feedback",
     rating: `${rating}/5`,
-    name: "City Whisperer User",
+    name: userName.trim() || "there",
     time: new Date().toLocaleString(),
 
     // ✅ MUST be a real email or empty string
@@ -188,6 +189,14 @@ export default function EndTour() {
             <span>1 - Poor</span> | <span>2 - Fair</span> | <span>3 - Average</span> |{" "}
             <span>4 - Very Good</span> | <span>5 - Excellent</span>
           </div>
+
+          <input
+  className="w-full p-2 border rounded-md mb-2"
+  placeholder="Your name (optional)"
+  value={userName}
+  onChange={(e) => setUserName(e.target.value)}
+/>
+
 
           {/* Optional user email */}
           <input
