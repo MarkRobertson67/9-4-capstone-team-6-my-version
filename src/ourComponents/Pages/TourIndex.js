@@ -9,6 +9,8 @@ const API = process.env.REACT_APP_API_URL;
 export default function TourIndex() {
   const [tours, setTours] = useState([]);
   const [expandedIndex, setExpandedIndex] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const scrollerRef = useRef(null);
 
@@ -19,10 +21,30 @@ export default function TourIndex() {
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
+
+    setLoading(true);
+    setError(null);
+
     axios
       .get(`${API}/tours`)
-      .then((res) => setTours(res.data))
-      .catch((e) => console.warn("Error fetching tours:", e));
+      .then((res) => {
+        if (!isMounted) return;
+        setTours(res.data);
+      })
+      .catch((e) => {
+        if (!isMounted) return;
+        console.warn("Error fetching tours:", e);
+        setError("Failed to load tours. Please try again.");
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        setLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Keep expand/collapse animation
@@ -79,7 +101,7 @@ export default function TourIndex() {
 
     // If card is clipped on the LEFT, scroll left just enough
     if (cardLeft < viewLeft + leftBuffer) {
-      const delta = (viewLeft + leftBuffer) - cardLeft;
+      const delta = viewLeft + leftBuffer - cardLeft;
       scroller.scrollBy({ left: -delta, behavior: "smooth" });
     }
 
@@ -151,62 +173,79 @@ export default function TourIndex() {
         <div
           ref={scrollerRef}
           className="flex gap-5 overflow-x-auto overscroll-x-contain
-                     scroll-smooth snap-x snap-mandatory
-                     py-2 px-2
-                     [scrollbar-width:thin]"
+             scroll-smooth snap-x snap-mandatory
+             py-2 px-2
+             [scrollbar-width:thin]"
         >
-          {tours.map((tour, index) => {
-            const expanded = index === expandedIndex;
+          {/* LOADING */}
+          {loading && (
+            <div className="w-full flex items-center justify-center py-24">
+              <div className="h-12 w-12 rounded-full border-4 border-white/40 border-t-white animate-spin" />
+            </div>
+          )}
 
-            return (
-              <motion.div
-                key={tour.id}
-                className="relative snap-start flex-shrink-0 cursor-pointer
-                           h-[500px] bg-cover bg-center rounded-[20px]
-                           overflow-hidden"
-                variants={cardVariants}
-                initial="collapsed"
-                animate={expanded ? "expanded" : "collapsed"}
-                transition={{ duration: 0.45 }}
-                style={{ backgroundImage: `url(${tour.image_url})` }}
-                onClick={(e) => handleShowClick(index, e.currentTarget)}
-              >
-                {/* DELETE BUTTON (only if not seed) */}
-                {!isSeedTour(tour) && (
-                  <button
-                    type="button"
-                    onClick={(e) => handleDelete(e, tour.id)}
-                    className="absolute top-3 right-3 z-40
-                               bg-red-600/90 hover:bg-red-600 text-white
-                               text-xs font-bold px-3 py-2 rounded-lg shadow-lg"
-                    title="Delete tour"
-                  >
-                    Delete
-                  </button>
-                )}
+          {/* ERROR */}
+          {!loading && error && (
+            <div className="w-full text-center py-24 text-white/90">
+              {error}
+            </div>
+          )}
 
-                {/* Footer overlay */}
-                <div className="h-full flex flex-col justify-end">
-                  <div className="rounded-b-[20px] bg-gray-800 bg-opacity-75 min-h-[110px] px-3 py-3 flex flex-col items-center justify-center">
-                    <h3 className="text-xl font-bold text-white text-center">
-                      {tour.city}
-                      {tour.state ? `, ${tour.state}` : ""}
-                      {tour.country ? `, ${tour.country}` : ""}
-                    </h3>
+          {/* TOURS */}
+          {!loading &&
+            !error &&
+            tours.map((tour, index) => {
+              const expanded = index === expandedIndex;
 
-                    {expanded && (
-                      <div
-                        className="mt-2 text-gray-200 text-center"
-                        onClick={(e) => e.stopPropagation()} // allow clicking link without collapsing
-                      >
-                        <TourCard tour={tour} />
-                      </div>
-                    )}
+              return (
+                <motion.div
+                  key={tour.id}
+                  className="relative snap-start flex-shrink-0 cursor-pointer
+                   h-[500px] bg-cover bg-center rounded-[20px]
+                   overflow-hidden"
+                  variants={cardVariants}
+                  initial="collapsed"
+                  animate={expanded ? "expanded" : "collapsed"}
+                  transition={{ duration: 0.45 }}
+                  style={{ backgroundImage: `url(${tour.image_url})` }}
+                  onClick={(e) => handleShowClick(index, e.currentTarget)}
+                >
+                  {/* DELETE BUTTON (only if not seed) */}
+                  {!isSeedTour(tour) && (
+                    <button
+                      type="button"
+                      onClick={(e) => handleDelete(e, tour.id)}
+                      className="absolute top-3 right-3 z-40
+                       bg-red-600/90 hover:bg-red-600 text-white
+                       text-xs font-bold px-3 py-2 rounded-lg shadow-lg"
+                      title="Delete tour"
+                    >
+                      Delete
+                    </button>
+                  )}
+
+                  {/* Footer overlay */}
+                  <div className="h-full flex flex-col justify-end">
+                    <div className="rounded-b-[20px] bg-gray-800 bg-opacity-75 min-h-[110px] px-3 py-3 flex flex-col items-center justify-center">
+                      <h3 className="text-xl font-bold text-white text-center">
+                        {tour.city}
+                        {tour.state ? `, ${tour.state}` : ""}
+                        {tour.country ? `, ${tour.country}` : ""}
+                      </h3>
+
+                      {expanded && (
+                        <div
+                          className="mt-2 text-gray-200 text-center"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <TourCard tour={tour} />
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            );
-          })}
+                </motion.div>
+              );
+            })}
         </div>
       </div>
     </section>
