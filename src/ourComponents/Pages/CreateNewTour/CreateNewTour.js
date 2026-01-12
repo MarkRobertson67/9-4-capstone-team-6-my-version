@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import loadingAnimation from "../../../assets/S-Loop_transnparent.gif";
 import "../CreateNewTour/CreateNewTour.css";
+import NoTourImageAvailable from "../../../assets/NoTourImageAvailale.png";
 
 // Sanitizer function to prevent SQL injection
 function sanitizeInput(input) {
@@ -64,7 +65,9 @@ const generatePOICommentary = async (poiName, cityName, countryName) => {
 
   while (retries < 5) {
     console.log(
-      `Attempt ${retries + 1}: Generating commentary for "${poiName}" in ${cityName}, ${countryName}...`
+      `Attempt ${
+        retries + 1
+      }: Generating commentary for "${poiName}" in ${cityName}, ${countryName}...`
     );
 
     const commentary = await generateCommentary(retries);
@@ -73,12 +76,19 @@ const generatePOICommentary = async (poiName, cityName, countryName) => {
     retries++;
   }
 
-  console.error(`Failed to generate commentary for ${poiName} after 5 retries.`);
+  console.error(
+    `Failed to generate commentary for ${poiName} after 5 retries.`
+  );
   return "";
 };
 
 // Insert POI into DB
-const insertPointOfInterest = async (poi, newTourId, coordinates, image_url) => {
+const insertPointOfInterest = async (
+  poi,
+  newTourId,
+  coordinates,
+  image_url
+) => {
   console.log("Inserting Point of Interest:", poi);
   console.log("New Tour ID:", newTourId);
   console.log("Coordinates:", coordinates);
@@ -101,7 +111,10 @@ const insertPointOfInterest = async (poi, newTourId, coordinates, image_url) => 
     );
 
     const poiId = response.data.id;
-    console.log(`Point of Interest "${poi}" added successfully:`, response.data);
+    console.log(
+      `Point of Interest "${poi}" added successfully:`,
+      response.data
+    );
     return poiId;
   } catch (error) {
     console.error(`Error adding Point of Interest "${poi}":`, error);
@@ -131,12 +144,14 @@ const getImageFromUnsplash = async (poi, cityName) => {
 };
 
 // City photo
-const fetchCityPhoto = async (cityName, setCityPhoto) => {
+const fetchCityPhoto = async (cityName, setCityPhoto, setUsingTourFallback) => {
   try {
     const response = await axios.get(
       `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
         cityName
-      )}&client_id=${config.unsplashApiKey}&count=1&order_by=relevant&per_page=1`,
+      )}&client_id=${
+        config.unsplashApiKey
+      }&count=1&order_by=relevant&per_page=1`,
       {
         headers: {
           Authorization: `Client-ID ${config.unsplashApiSecretKey}`,
@@ -145,11 +160,24 @@ const fetchCityPhoto = async (cityName, setCityPhoto) => {
     );
 
     const photoUrl = response.data.results[0]?.urls?.regular || "";
-    setCityPhoto(photoUrl);
-    return photoUrl;
+
+    if (photoUrl) {
+      setCityPhoto(photoUrl);
+      setUsingTourFallback(false);
+      return photoUrl;
+    }
+
+    // No result => use local fallback
+    setCityPhoto(NoTourImageAvailable);
+    setUsingTourFallback(true);
+    return NoTourImageAvailable;
   } catch (error) {
     console.error("Error fetching city photo:", error);
-    return "";
+
+    // Error => use local fallback
+    setCityPhoto(NoTourImageAvailable);
+    setUsingTourFallback(true);
+    return NoTourImageAvailable;
   }
 };
 
@@ -189,8 +217,11 @@ export default function CreateNewTour() {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [cityPhoto, setCityPhoto] = useState("");
+  const [cityPhoto, setCityPhoto] = useState(null);
+  const [usingTourFallback, setUsingTourFallback] = useState(false);
   const navigate = useNavigate();
+  const [isFetchingImage, setIsFetchingImage] = useState(false);
+
 
   // Parse: "1. Place (41.0000° N, 2.0000° E)"
   const parsePointsOfInterestAndCoordinates = (generatedTour) => {
@@ -215,7 +246,10 @@ export default function CreateNewTour() {
 
       matches.push({
         poi,
-        coordinates: { latitude: adjustedLatitude, longitude: adjustedLongitude },
+        coordinates: {
+          latitude: adjustedLatitude,
+          longitude: adjustedLongitude,
+        },
       });
     }
 
@@ -333,6 +367,9 @@ export default function CreateNewTour() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setIsFetchingImage(true);
+    setCityPhoto(null);
+    setUsingTourFallback(false);
 
     const generatedWalkingTour = await generateWalkingTour();
     if (!generatedWalkingTour) {
@@ -342,7 +379,12 @@ export default function CreateNewTour() {
 
     const { sanitizedPointsOfInterest, coordinates } = generatedWalkingTour;
 
-    const cityPhotoUrl = await fetchCityPhoto(tour.city, setCityPhoto);
+    const cityPhotoUrl = await fetchCityPhoto(
+      tour.city,
+      setCityPhoto,
+      setUsingTourFallback
+    );
+    
 
     const newTour = {
       country: sanitizeInput(tour.country),
@@ -374,7 +416,10 @@ export default function CreateNewTour() {
         try {
           poiImageUrl = await getImageFromUnsplash(poi, tour.city);
         } catch (imageError) {
-          console.error(`Error fetching image for ${poi} from Unsplash:`, imageError);
+          console.error(
+            `Error fetching image for ${poi} from Unsplash:`,
+            imageError
+          );
         }
 
         const poiId = await insertPointOfInterest(
@@ -400,156 +445,176 @@ export default function CreateNewTour() {
     } catch (error) {
       console.error("Error adding tour:", error);
       setIsLoading(false);
+      setIsFetchingImage(false);
+
     }
   };
 
   return (
-    <div className="min-h-screen gradient-day-to-night" style={{ paddingTop: "200px" }}>
-      <div className="">
-        <h1 className="luxury-font text-3xl text-center mb-4 font-extrabold text-sky-950 drop-shadow-lg">
-          Ready to Explore?
-        </h1>
+  <div
+    className="min-h-screen gradient-day-to-night"
+    style={{ paddingTop: "200px" }}
+  >
+    <div className="">
+      <h1 className="luxury-font text-3xl text-center mb-4 font-extrabold text-sky-950 drop-shadow-lg">
+        Ready to Explore?
+      </h1>
 
-        <p className="generator-directions text-lg font-semibold text-sky-950 drop-shadow-lg">
-          Explore the world and create your own adventure! Whether you're a history buff, a foodie,
-          or an outdoor enthusiast, there's a unique journey waiting for you. Uncover hidden gems,
-          savor local flavors, and embark on unforgettable experiences.
-        </p>
+      <p className="generator-directions text-lg font-semibold text-sky-950 drop-shadow-lg">
+        Explore the world and create your own adventure! Whether you're a
+        history buff, a foodie, or an outdoor enthusiast, there's a unique
+        journey waiting for you. Uncover hidden gems, savor local flavors, and
+        embark on unforgettable experiences.
+      </p>
 
-        <div className="content-container background-image rounded-lg">
-          <div className="flex items-center justify-evenly">
-            <div className="fields-container rounded-lg">
-              <div className="field mb-3">
-                <input
-                  type="text"
-                  className="input rounded-lg border"
-                  placeholder="Enter a City to Explore"
-                  name="city"
-                  value={tour.city}
-                  onChange={handleTextChange}
-                />
-              </div>
-
-              <div className="field mb-3">
-                <input
-                  type="text"
-                  className="input rounded-lg border"
-                  placeholder="Borough/Region if applicable"
-                  name="region"
-                  value={tour.region}
-                  onChange={handleTextChange}
-                />
-              </div>
-
-              <div className="field mb-3">
-                <input
-                  type="text"
-                  className="input rounded-lg border"
-                  placeholder="State/County/Province if applicable"
-                  name="state"
-                  value={tour.state}
-                  onChange={handleTextChange}
-                />
-              </div>
-
-              <div className="field mb-3">
-                <input
-                  type="text"
-                  className="input rounded-lg border"
-                  placeholder="Enter the Country"
-                  name="country"
-                  value={tour.country}
-                  onChange={handleTextChange}
-                />
-              </div>
-
-              <div className="field mb-3">
-                <select
-                  className="input rounded-lg border"
-                  value={tour.duration}
-                  onChange={handleDropdownChange}
-                  id="duration"
-                >
-                  <option value="" disabled>
-                    Select Day Duration
-                  </option>
-                  <option value="Full-day">Full-day</option>
-                  <option value="Half-day">Half-day</option>
-                  <option value="2 hours">2 hours</option>
-                </select>
-              </div>
-
-              <div className="field mb-3">
-                <select
-                  className="input rounded-lg border"
-                  value={tour.difficulty}
-                  onChange={handleDropdownChange}
-                  id="difficulty"
-                >
-                  <option value="" disabled>
-                    Select Walking Difficulty
-                  </option>
-                  <option value="Easy">Easy</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Hard">Hard</option>
-                </select>
-              </div>
-
-              <div className="field mb-16">
-                <select
-                  className="input rounded-lg border"
-                  value={tour.theme}
-                  onChange={handleDropdownChange}
-                  id="theme"
-                >
-                  <option value="" disabled>
-                    Select Tour Theme
-                  </option>
-                  <option value="Historic">Historic</option>
-                  <option value="Scenic">Scenic</option>
-                  <option value="Fun">Fun</option>
-                  <option value="Museums">Museums</option>
-                  <option value="Pubs">Pubs</option>
-                </select>
-
-                <div className="mb-3 text-center">
-                  <button
-                    onClick={handleSubmit}
-                    disabled={!tour.city || isLoading}
-                    type="button"
-                    className="mt-6 inline-block rounded bg-[#183759] px-6 py-2 text-xs font-bold text-[#dbd4db] uppercase leading-normal transition duration-150 ease-in-out hover:bg-primary-600 hover:scale-110"
-                  >
-                    Generate Walking Tour
-                  </button>
-                </div>
-              </div>
+      <div className="content-container background-image rounded-lg">
+        <div className="flex items-center justify-evenly">
+          <div className="fields-container rounded-lg">
+            <div className="field mb-3">
+              <input
+                type="text"
+                className="input rounded-lg border"
+                placeholder="Enter a City to Explore"
+                name="city"
+                value={tour.city}
+                onChange={handleTextChange}
+              />
             </div>
 
-            {isLoading && cityPhoto && (
-              <div className="max-w-xl flex items-center">
-                <img src={cityPhoto} alt={`${tour.city}`} className="max-w-xl max-h-[550px]" />
-              </div>
-            )}
+            <div className="field mb-3">
+              <input
+                type="text"
+                className="input rounded-lg border"
+                placeholder="Borough/Region if applicable"
+                name="region"
+                value={tour.region}
+                onChange={handleTextChange}
+              />
+            </div>
 
-            {isLoading ? (
-              <div className="loading-logo text-center fixed inset-0 flex flex-col items-center justify-center bg-gray-800 bg-opacity-50">
-                <p>Loading...</p>
-                <div style={{ margin: "16px 0" }}>
-                  <div className="flex justify-center items-center h-screen">
-                    <img
-                      src={loadingAnimation}
-                      alt="Loading..."
-                      className={cityPhoto ? "w-1/4 mr-28" : "w-1/4"}
-                    />
-                  </div>
-                </div>
+            <div className="field mb-3">
+              <input
+                type="text"
+                className="input rounded-lg border"
+                placeholder="State/County/Province if applicable"
+                name="state"
+                value={tour.state}
+                onChange={handleTextChange}
+              />
+            </div>
+
+            <div className="field mb-3">
+              <input
+                type="text"
+                className="input rounded-lg border"
+                placeholder="Enter the Country"
+                name="country"
+                value={tour.country}
+                onChange={handleTextChange}
+              />
+            </div>
+
+            <div className="field mb-3">
+              <select
+                className="input rounded-lg border"
+                value={tour.duration}
+                onChange={handleDropdownChange}
+                id="duration"
+              >
+                <option value="" disabled>
+                  Select Day Duration
+                </option>
+                <option value="Full-day">Full-day</option>
+                <option value="Half-day">Half-day</option>
+                <option value="2 hours">2 hours</option>
+              </select>
+            </div>
+
+            <div className="field mb-3">
+              <select
+                className="input rounded-lg border"
+                value={tour.difficulty}
+                onChange={handleDropdownChange}
+                id="difficulty"
+              >
+                <option value="" disabled>
+                  Select Walking Difficulty
+                </option>
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+            </div>
+
+            <div className="field mb-16">
+              <select
+                className="input rounded-lg border"
+                value={tour.theme}
+                onChange={handleDropdownChange}
+                id="theme"
+              >
+                <option value="" disabled>
+                  Select Tour Theme
+                </option>
+                <option value="Historic">Historic</option>
+                <option value="Scenic">Scenic</option>
+                <option value="Fun">Fun</option>
+                <option value="Museums">Museums</option>
+                <option value="Pubs">Pubs</option>
+              </select>
+
+              <div className="mb-3 text-center">
+                <button
+                  onClick={handleSubmit}
+                  disabled={!tour.city || isLoading}
+                  type="button"
+                  className="mt-6 inline-block rounded bg-[#183759] px-6 py-2 text-xs font-bold text-[#dbd4db] uppercase leading-normal transition duration-150 ease-in-out hover:bg-primary-600 hover:scale-110"
+                >
+                  Generate Walking Tour
+                </button>
               </div>
-            ) : (
-              ""
-            )}
+            </div>
           </div>
+
+          {/* Preview image while loading */}
+          {isLoading && (
+            <div className="max-w-xl flex flex-col items-center">
+              {cityPhoto ? (
+                <>
+                  <img
+                    src={cityPhoto}
+                    alt={tour.city ? `${tour.city}` : "Tour image"}
+                    className="max-w-xl max-h-[550px] rounded-lg"
+                    onError={(e) => {
+                      e.currentTarget.src = NoTourImageAvailable;
+                      setUsingTourFallback(true);
+                    }}
+                  />
+
+                  {usingTourFallback && (
+                    <p className="mt-2 text-xs text-gray-500 italic text-center">
+                      We couldn’t find an image for this tour — here’s a
+                      stand-in while we track one down.
+                    </p>
+                  )}
+                </>
+              ) : (
+                <div className="w-[420px] h-[300px] rounded-lg 
+                bg-gray-300/40 
+                animate-pulse" />
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
-  );
+
+    {/* Fullscreen overlay ONLY while fetching the image */}
+    {isFetchingImage && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
+        <img src={loadingAnimation} alt="Loading..." className="w-1/4" />
+      </div>
+    )}
+  </div>
+);
 }
