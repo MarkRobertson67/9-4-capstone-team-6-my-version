@@ -150,7 +150,6 @@ const getImageFromUnsplash = async (poi, cityName) => {
 };
 
 
-
 // City photo (with local fallback)
 const fetchCityPhoto = async (cityName, setCityPhoto) => {
   try {
