@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import loadingAnimation from "../../../assets/S-Loop_transnparent.gif";
 import "../CreateNewTour/CreateNewTour.css";
 import NoTourImageAvailable from "../../../assets/NoTourImageAvailale.png";
+import NoPOIImageAvailable from "../../../assets/NoPOIImageAvailable.png";
 
 // Sanitizer function to prevent SQL injection
 function sanitizeInput(input) {
@@ -122,7 +123,7 @@ const insertPointOfInterest = async (
   }
 };
 
-// Unsplash image for POI
+// Unsplash image for POI (with local fallback)
 const getImageFromUnsplash = async (poi, cityName) => {
   try {
     const query = `${encodeURIComponent(poi)} ${encodeURIComponent(cityName)}`;
@@ -136,22 +137,27 @@ const getImageFromUnsplash = async (poi, cityName) => {
       }
     );
 
-    return response.data.results[0]?.urls?.regular || "";
+    const url = response.data.results[0]?.urls?.regular || "";
+
+    // ✅ If no Unsplash result, return local fallback
+    return url || NoPOIImageAvailable;
   } catch (error) {
     console.error(`Error fetching image for ${poi} from Unsplash:`, error);
-    return "";
+
+    // ✅ If request fails, return local fallback
+    return NoPOIImageAvailable;
   }
 };
 
-// City photo
-const fetchCityPhoto = async (cityName, setCityPhoto, setUsingTourFallback) => {
+
+
+// City photo (with local fallback)
+const fetchCityPhoto = async (cityName, setCityPhoto) => {
   try {
     const response = await axios.get(
       `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
         cityName
-      )}&client_id=${
-        config.unsplashApiKey
-      }&count=1&order_by=relevant&per_page=1`,
+      )}&client_id=${config.unsplashApiKey}&count=1&order_by=relevant&per_page=1`,
       {
         headers: {
           Authorization: `Client-ID ${config.unsplashApiSecretKey}`,
@@ -159,27 +165,20 @@ const fetchCityPhoto = async (cityName, setCityPhoto, setUsingTourFallback) => {
       }
     );
 
-    const photoUrl = response.data.results[0]?.urls?.regular || "";
+    const url = response.data.results[0]?.urls?.regular || "";
 
-    if (photoUrl) {
-      setCityPhoto(photoUrl);
-      setUsingTourFallback(false);
-      return photoUrl;
-    }
+    const finalUrl = url || NoTourImageAvailable;
+    setCityPhoto(finalUrl);
 
-    // No result => use local fallback
-    setCityPhoto(NoTourImageAvailable);
-    setUsingTourFallback(true);
-    return NoTourImageAvailable;
+    return finalUrl;
   } catch (error) {
     console.error("Error fetching city photo:", error);
 
-    // Error => use local fallback
     setCityPhoto(NoTourImageAvailable);
-    setUsingTourFallback(true);
     return NoTourImageAvailable;
   }
 };
+
 
 // Insert commentary into DB
 const insertCommentary = async (poiId, commName, description) => {
@@ -218,7 +217,6 @@ export default function CreateNewTour() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [cityPhoto, setCityPhoto] = useState(null);
-  const [usingTourFallback, setUsingTourFallback] = useState(false);
   const navigate = useNavigate();
   const [isFetchingImage, setIsFetchingImage] = useState(false);
 
@@ -365,24 +363,26 @@ export default function CreateNewTour() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setIsFetchingImage(true);
-    setCityPhoto(null);
-    setUsingTourFallback(false);
+  e.preventDefault();
 
-    const generatedWalkingTour = await generateWalkingTour();
-    if (!generatedWalkingTour) {
-      console.error("Walking tour generation failed.");
-      return;
-    }
+  setIsLoading(true);
+  setIsFetchingImage(true);
+  setCityPhoto(null); // reset so skeleton shows, not fallback
+
+  const generatedWalkingTour = await generateWalkingTour();
+  if (!generatedWalkingTour) {
+    console.error("Walking tour generation failed.");
+    setIsLoading(false);
+    setIsFetchingImage(false);
+    return;
+  }
+
 
     const { sanitizedPointsOfInterest, coordinates } = generatedWalkingTour;
 
     const cityPhotoUrl = await fetchCityPhoto(
       tour.city,
       setCityPhoto,
-      setUsingTourFallback
     );
     
 
@@ -451,20 +451,16 @@ export default function CreateNewTour() {
   };
 
   return (
-  <div
-    className="min-h-screen gradient-day-to-night"
-    style={{ paddingTop: "200px" }}
-  >
+  <div className="min-h-screen gradient-day-to-night" style={{ paddingTop: "200px" }}>
     <div className="">
       <h1 className="luxury-font text-3xl text-center mb-4 font-extrabold text-sky-950 drop-shadow-lg">
         Ready to Explore?
       </h1>
 
       <p className="generator-directions text-lg font-semibold text-sky-950 drop-shadow-lg">
-        Explore the world and create your own adventure! Whether you're a
-        history buff, a foodie, or an outdoor enthusiast, there's a unique
-        journey waiting for you. Uncover hidden gems, savor local flavors, and
-        embark on unforgettable experiences.
+        Explore the world and create your own adventure! Whether you're a history buff, a foodie,
+        or an outdoor enthusiast, there's a unique journey waiting for you. Uncover hidden gems,
+        savor local flavors, and embark on unforgettable experiences.
       </p>
 
       <div className="content-container background-image rounded-lg">
@@ -587,21 +583,18 @@ export default function CreateNewTour() {
                     className="max-w-xl max-h-[550px] rounded-lg"
                     onError={(e) => {
                       e.currentTarget.src = NoTourImageAvailable;
-                      setUsingTourFallback(true);
                     }}
                   />
 
-                  {usingTourFallback && (
-                    <p className="mt-2 text-xs text-gray-500 italic text-center">
-                      We couldn’t find an image for this tour — here’s a
-                      stand-in while we track one down.
+                  {/* show message ONLY if we ended up on the fallback image */}
+                  {cityPhoto === NoTourImageAvailable && (
+                    <p className="mt-2 text-xs text-gray-200 italic text-center">
+                      We couldn’t find an image for this tour — here’s a stand-in while we track one down.
                     </p>
                   )}
                 </>
               ) : (
-                <div className="w-[420px] h-[300px] rounded-lg 
-                bg-gray-300/40 
-                animate-pulse" />
+                <div className="w-[420px] h-[300px] rounded-lg bg-gray-300/60 animate-pulse" />
               )}
             </div>
           )}
@@ -617,4 +610,5 @@ export default function CreateNewTour() {
     )}
   </div>
 );
+
 }
