@@ -1,17 +1,16 @@
-import React, { useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { motion, useAnimation, useScroll } from 'framer-motion';
-import JosephPhoto from '../../../assets/aboutPhotos/JosephR.png';
-import RaydelysPhoto from '../../../assets/aboutPhotos/Raydelys.jpg';
-import JacquelinePhoto from '../../../assets/aboutPhotos/JacquelineP.png';
-import MarkPhoto from '../../../assets/aboutPhotos/Mark.jpg';
-import githubJPEG from '../../../assets/aboutPhotos/github.jpeg';
-import linkedinPNG from '../../../assets/aboutPhotos/linkedin.png';
-import marker from '../../../assets/aboutPhotos/markerSite.png'
-import '../About/About.css';
+import React, { useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { motion, useAnimation, useScroll } from "framer-motion";
+import JosephPhoto from "../../../assets/aboutPhotos/JosephR.png";
+import RaydelysPhoto from "../../../assets/aboutPhotos/Raydelys.jpg";
+import JacquelinePhoto from "../../../assets/aboutPhotos/JacquelineP.png";
+import MarkPhoto from "../../../assets/aboutPhotos/Mark.jpg";
+import githubJPEG from "../../../assets/aboutPhotos/github.jpeg";
+import linkedinPNG from "../../../assets/aboutPhotos/linkedin.png";
+import marker from "../../../assets/aboutPhotos/markerSite.png";
+import "../About/About.css";
 
 function About() {
-
   const teamMembers = [
     {
       name: "Mark Roberston",
@@ -73,32 +72,84 @@ function About() {
   }, [scrollControls, scrollY]);
 
   return (
-    <div className="home-content flex justify-center items-center about-background mt-16 lg:mt-24">
+    <div
+      className="
+    about-background
+    home-content
+    min-h-screen
+    w-screen
+    relative left-1/2 right-1/2
+    -ml-[50vw] -mr-[50vw]
+    flex justify-center
+    mt-16 lg:mt-24
+  "
+    >
       <div className="container mx-auto px-4">
         <div className="about p-4">
           <div className="app-summary-container bg-cyan-200 rounded-lg">
-            <img src={marker} alt="markerPin" className="markerPin" />&nbsp;&nbsp;&nbsp;
-            <strong className="luxury-font font-size text-sky-950 drop-shadow-lg">City Whisperer</strong>
+            <img src={marker} alt="markerPin" className="markerPin" />
+            &nbsp;&nbsp;&nbsp;
+            <strong className="luxury-font font-size text-sky-950 drop-shadow-lg">
+              City Whisperer
+            </strong>
             <br />
             <p className="text-lg font-medium p text-sky-950 drop-shadow-lg">
-              Introduced in August 2023 as a capstone project, redefines the way travelers experience cities. This app empowers tourists with pre-planned walking routes and points of interest, complemented by audio commentary, facilitating efficient and immersive city exploration. By providing valuable insights and a user-friendly interface, City Whisperer enhances the overall travel experience, enabling users to make the most of their visits while enjoying the freedom of self-guided tours. It's the perfect companion for travelers seeking both convenience and adventure on their journeys.</p>
+              Introduced in August 2023 as a capstone project, redefines the way
+              travelers experience cities. This app empowers tourists with
+              pre-planned walking routes and points of interest, complemented by
+              audio commentary, facilitating efficient and immersive city
+              exploration. By providing valuable insights and a user-friendly
+              interface, City Whisperer enhances the overall travel experience,
+              enabling users to make the most of their visits while enjoying the
+              freedom of self-guided tours. It's the perfect companion for
+              travelers seeking both convenience and adventure on their
+              journeys.
+            </p>
             <br />
-            <img src={marker} alt="markerPin" className="markerPin" />&nbsp;&nbsp;&nbsp;
-            <strong className="luxury-font font-size text-sky-950 drop-shadow-lg">The Features</strong>
+            <img src={marker} alt="markerPin" className="markerPin" />
+            &nbsp;&nbsp;&nbsp;
+            <strong className="luxury-font font-size text-sky-950 drop-shadow-lg">
+              The Features
+            </strong>
             <p className="text-lg p font-medium text-sky-950 drop-shadow-lg">
-              City Whisperer features include AI-generated walking tours, customizable filters, and seamless Google Maps integration, you can explore cities like never before. Enjoy audio commentary through Text-to-Speech (TTS). And in the later future the team will integrate secure and convenient login options for all users.</p>
+              City Whisperer features include AI-generated walking tours,
+              customizable filters, and seamless Google Maps integration, you
+              can explore cities like never before. Enjoy audio commentary
+              through Text-to-Speech (TTS). And in the later future the team
+              will integrate secure and convenient login options for all users.
+            </p>
             <br />
-            <img src={marker} alt="markerPin" className="markerPin" />&nbsp;&nbsp;&nbsp;
-            <strong className="luxury-font font-size text-sky-950 drop-shadow-lg">Our Mission</strong>
+            <img src={marker} alt="markerPin" className="markerPin" />
+            &nbsp;&nbsp;&nbsp;
+            <strong className="luxury-font font-size text-sky-950 drop-shadow-lg">
+              Our Mission
+            </strong>
             <br />
             <p className="text-lg p font-medium text-sky-950 drop-shadow-lg">
-              Our mission is to empower travelers to experience cities like never before. We believe in enhancing the journey by offering self-guided walking tours that are not only informative but also deeply personalized. Our goal is to provide users with the freedom to explore at their own pace, uncover hidden gems, and connect with the culture and history of the places they visit. We're dedicated to curating an ever-growing library of AI-generated tours, fostering a sense of discovery, and making travel more accessible and enriching for everyone. City Whisperer is on a mission to redefine city exploration, one step at a time.</p>
+              Our mission is to empower travelers to experience cities like
+              never before. We believe in enhancing the journey by offering
+              self-guided walking tours that are not only informative but also
+              deeply personalized. Our goal is to provide users with the freedom
+              to explore at their own pace, uncover hidden gems, and connect
+              with the culture and history of the places they visit. We're
+              dedicated to curating an ever-growing library of AI-generated
+              tours, fostering a sense of discovery, and making travel more
+              accessible and enriching for everyone. City Whisperer is on a
+              mission to redefine city exploration, one step at a time.
+            </p>
             <br />
-            <img src={marker} alt="markerPin" className="markerPin" />&nbsp;&nbsp;&nbsp;
-            <strong className="luxury-font font-size text-sky-950 drop-shadow-lg">Our Development Team</strong>
+            <img src={marker} alt="markerPin" className="markerPin" />
+            &nbsp;&nbsp;&nbsp;
+            <strong className="luxury-font font-size text-sky-950 drop-shadow-lg">
+              Our Development Team
+            </strong>
             <br />
             <p className="text-lg p font-medium text-sky-950 drop-shadow-lg">
-              Our team is a dynamic and passionate group of full-stack developers, each bringing their unique skills and backgrounds to the project. Together, this dedicated team is committed to redefining city exploration through AI-generated walking tours, making travel more enriching and accessible for all.
+              Our team is a dynamic and passionate group of full-stack
+              developers, each bringing their unique skills and backgrounds to
+              the project. Together, this dedicated team is committed to
+              redefining city exploration through AI-generated walking tours,
+              making travel more enriching and accessible for all.
             </p>
           </div>
         </div>
@@ -108,10 +159,12 @@ function About() {
               src={marker}
               alt="markerPin"
               className="markerPin"
-              style={{ width: '24px', height: '24px' }}
-            />&nbsp;
+              style={{ width: "24px", height: "24px" }}
+            />
+            &nbsp;
             <h1 className="font-bold text-xl text-center my-0 dancing-script text-sky-950 drop-shadow-lg p-2">
-              Meet the Team</h1>
+              Meet the Team
+            </h1>
           </div>
           <div className="team-members mt-4">
             {teamMembers.map((member, index) => (
@@ -123,7 +176,7 @@ function About() {
                   <motion.img
                     className="rounded-lg medium-photo"
                     src={member.photo}
-                    style={{ height: '200px', width: '200px' }}
+                    style={{ height: "200px", width: "200px" }}
                     alt={member.name}
                     initial={{ opacity: 0, y: 100 }} // Initial animation state
                     animate={scrollControls} // the animation controls
@@ -136,11 +189,11 @@ function About() {
                     className="scrollable-content" //custom styling for scrolling content
                   >
                     <motion.p
-                      className="text-base bio-paragraph font-semibold text-lg text-sky-950"
+                      className="text-base bio-paragraph font-semibold text-sky-950"
                       initial={{ opacity: 0, y: 100 }}
                       animate={scrollControls}
                       transition={{ duration: 0.5, delay: 0.2 }}
-                      style={{ textAlign: 'left' }}
+                      style={{ textAlign: "left" }}
                     >
                       {member.bio}
                     </motion.p>

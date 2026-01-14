@@ -1,74 +1,90 @@
-// /*global google*/
-import { GoogleMap, MarkerF, DirectionsRenderer } from '@react-google-maps/api'
-import { useState, useEffect } from 'react';
+import { GoogleMap, MarkerF, DirectionsRenderer } from "@react-google-maps/api";
+import { useState, useEffect, useMemo } from "react";
 
 
-const google = window.google = window.google ? window.google : {}
 
-// Do I need activeMarker
-export default function Map({ pointsOfInterest, allPointsOfInterest, activeMarker }) {
+export default function Map({ pointsOfInterest = [], allPointsOfInterest = [], activeMarker }) {
+  const [directionsResponse, setDirectionsResponse] = useState(null);
 
-  const [directionsResponse, setDirectionsResponse] = useState(null)
+  const firstPoi = useMemo(() => {
+    if (!pointsOfInterest.length || !allPointsOfInterest.length) return null;
+    return allPointsOfInterest.find((el) => el.poi_name === pointsOfInterest[0]) || null;
+  }, [pointsOfInterest, allPointsOfInterest]);
 
-  const firstPoi = allPointsOfInterest.find((el) => el.poi_name === pointsOfInterest[0])
+  // Build directions service only when google is available
+  const directionsService = useMemo(() => {
+    if (!window.google?.maps) return null;
+    return new window.google.maps.DirectionsService();
+  }, []);
 
-  // eslint-disable-next-line no-undef
-  const directionsService = new google.maps.DirectionsService()
   const calculateRoute = async () => {
+    if (!directionsService || !firstPoi) return;
+
     const waypoints = pointsOfInterest.slice(1, -1).map((poi) => {
-      const newPointsOfInterest = allPointsOfInterest.find((el) => el.poi_name === poi)
-      const locationObj = { location: { lat: Number(newPointsOfInterest.latitude), lng: Number(newPointsOfInterest.longitude) } }
-      return locationObj
-    })
-    const lastPoi = allPointsOfInterest.find((el) => el.poi_name === pointsOfInterest[pointsOfInterest.length - 1])
+      const p = allPointsOfInterest.find((el) => el.poi_name === poi);
+      return {
+        location: { lat: Number(p.latitude), lng: Number(p.longitude) },
+      };
+    });
+
+    const lastPoi =
+      allPointsOfInterest.find(
+        (el) => el.poi_name === pointsOfInterest[pointsOfInterest.length - 1]
+      ) || null;
+
+    if (!lastPoi) return;
+
     const results = await directionsService.route({
       origin: { lat: Number(firstPoi.latitude), lng: Number(firstPoi.longitude) },
-      waypoints,
       destination: { lat: Number(lastPoi.latitude), lng: Number(lastPoi.longitude) },
-      // eslint-disable-next-line no-undef
-      travelMode: google.maps.TravelMode.WALKING
-    })
-    setDirectionsResponse(results)
-  }
+      waypoints,
+      travelMode: window.google.maps.TravelMode.WALKING,
+    });
 
+    setDirectionsResponse(results);
+  };
 
   useEffect(() => {
-    calculateRoute()
+    calculateRoute();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [directionsService, firstPoi]);
 
   const settingCustomMarker = (img) => {
-
-    const customMarkerIcon = {
+    if (!window.google?.maps) return undefined;
+    return {
       url: img,
-      // eslint-disable-next-line no-undef
-      scaledSize: new google.maps.Size(40, 40)
-    }
-    return customMarkerIcon
-  }
+      scaledSize: new window.google.maps.Size(40, 40),
+    };
+  };
+
+  if (!firstPoi) return null;
 
   return (
-    <div position='center' className='lg:h-[300px] lg:w-[600px] max-[760px]:h-24'>
+    // ✅ THIS is the key: Map fills the wrapper from Tour.js
+    <div className="w-full h-full">
       <GoogleMap
         center={{ lat: Number(firstPoi.latitude), lng: Number(firstPoi.longitude) }}
         zoom={15}
-        mapContainerStyle={{ width: '105%', height: '150%' }}
-        options={{
-          mapTypeControl: false,
-        }}
+        // ✅ Make map size purely controlled by parent
+        mapContainerStyle={{ width: "100%", height: "100%" }}
+        options={{ mapTypeControl: false }}
       >
-        {
-          pointsOfInterest.length && allPointsOfInterest.length &&
-          pointsOfInterest.map((poi) => {
-            const newPointsOfInterest = allPointsOfInterest.find((el) => el.poi_name === poi)
-            return newPointsOfInterest
-          }).map(({ latitude, longitude, image_url, poi_name }, index) => <MarkerF key={index} position={{ lat: Number(latitude), lng: Number(longitude) }} icon={settingCustomMarker(image_url)} animation={null} />)
-        }
+        {pointsOfInterest.length &&
+          allPointsOfInterest.length &&
+          pointsOfInterest
+            .map((poi) => allPointsOfInterest.find((el) => el.poi_name === poi))
+            .filter(Boolean)
+            .map(({ latitude, longitude, image_url }, index) => (
+              <MarkerF
+                key={index}
+                position={{ lat: Number(latitude), lng: Number(longitude) }}
+                icon={settingCustomMarker(image_url)}
+                animation={null}
+              />
+            ))}
+
         {directionsResponse && <DirectionsRenderer directions={directionsResponse} />}
       </GoogleMap>
-      <br />
-      <div>
-      </div>
     </div>
-  )
+  );
 }
