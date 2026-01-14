@@ -6,22 +6,9 @@ import image2 from "../../assets/travelPhotos/dan-novac-1naE8177_bI-unsplash.jpg
 import image3 from "../../assets/travelPhotos/bjorn-agerbeek-ak8uY9rVDOs-unsplash.jpg";
 import image4 from "../../assets/travelPhotos/timo-stern-iUBgeNeyVy8-unsplash.jpg";
 
-// import image4 from "../../assets/travelPhotos/dan-novac-1naE8177_bI-unsplash.jpg";
-// import image5 from "../../assets/travelPhotos/billy-huynh-v9bnfMCyKbg-unsplash.jpg"
 import { Carousel, Ripple, initTE } from "tw-elements";
-// import { useLocation } from "react-router-dom";
-// import { useState } from "react"
 
 export default function Home() {
-  // const [isMuted, setIsMuted] = useState(false);
-
-  // const toggleMute = () => {
-  //   setIsMuted(!isMuted);
-  // };
-
-  // const location = useLocation();
-  // const [ loaded, setLoaded] = useState(false)
-
   useEffect(() => {
     initTE({ Carousel, Ripple });
   }, []);
@@ -54,16 +41,25 @@ export default function Home() {
             aria-label="Slide 2"
           ></button>
         </div>
-        <div className="relative w-full overflow-hidden after:clear-both after:block after:content-['']">
+        <div className="relative w-full after:clear-both after:block after:content-['']">
           <div
             className="relative float-left -mr-[100%] hidden w-full !transform-none opacity-0 transition-opacity duration-[600ms] ease-in-out motion-reduce:transition-none"
             data-te-carousel-fade
             data-te-carousel-item
             data-te-carousel-active
           >
-            <div className="relative h-[100vh] w-full overflow-hidden">
+            <div
+              className="
+              relative
+              h-[100vh]
+              w-screen
+              left-1/2 right-1/2
+              -ml-[50vw] -mr-[50vw]
+              overflow-hidden
+            "
+            >
               <video
-                className="h-full w-full object-cover"
+                className="absolute inset-0 h-full w-full object-cover"
                 autoPlay
                 muted
                 loop
@@ -74,35 +70,38 @@ export default function Home() {
                 <source src={video1} type="video/mp4" />
               </video>
             </div>
-
-            <div className="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-white md:block">
-              {/* <h5 class="text-xl">First slide label</h5> */}
-              {/* <p>Some representative placeholder content for the first slide.</p> */}
-            </div>
+            <div className="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-white md:block"></div>
           </div>
           <div
             className="relative float-left -mr-[100%] hidden w-full !transform-none opacity-0 transition-opacity duration-[600ms] ease-in-out motion-reduce:transition-none"
             data-te-carousel-fade
             data-te-carousel-item
           >
-            <div className="relative h-[100vh] w-full overflow-hidden">
-              <video
-                className="h-full w-full object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="auto"
-                controls
-              >
-                <source src={video2} type="video/mp4" />
-              </video>
-            </div>
+            <div
+  className="
+    relative
+    h-[100vh]
+    w-screen
+    left-1/2 right-1/2
+    -ml-[50vw] -mr-[50vw]
+    overflow-hidden
+  "
+>
+  <video
+    className="absolute inset-0 h-full w-full object-cover"
+    autoPlay
+    muted
+    loop
+    playsInline
+    preload="auto"
+    controls
+  >
+    <source src={video2} type="video/mp4" />
+  </video>
+</div>
 
-            <div className="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-white md:block">
-              {/* <h5 class="text-xl">Second slide label</h5> */}
-              {/* <p>Some representative placeholder content for the second slide.</p> */}
-            </div>
+
+            <div className="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-white md:block"></div>
           </div>
         </div>
         <button
@@ -245,13 +244,3 @@ export default function Home() {
     </div>
   );
 }
-
-// import './Pages.css';
-
-// export default function Home() {
-//   return (
-//     <div>
-//       <p className="home-content">Home</p>
-//     </div>
-//   );
-// }

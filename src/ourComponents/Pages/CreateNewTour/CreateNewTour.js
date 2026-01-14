@@ -444,8 +444,14 @@ export default function CreateNewTour() {
 
   return (
     <div
-      className="min-h-screen gradient-day-to-night"
-      style={{ paddingTop: "200px" }}
+      className="
+    gradient-day-to-night
+    min-h-screen
+    w-screen
+    relative left-1/2 right-1/2
+    -ml-[50vw] -mr-[50vw]
+    pt-[200px]
+  "
     >
       <div className="">
         <h1 className="luxury-font text-3xl text-center mb-4 font-extrabold text-sky-950 drop-shadow-lg">

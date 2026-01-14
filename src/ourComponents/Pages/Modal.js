@@ -2,13 +2,12 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AiOutlineCloseSquare } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import { HiPlay, HiMiniPause, HiStop } from "react-icons/hi2";
-import "./Pages.css";
 
 const synth = typeof window !== "undefined" ? window.speechSynthesis : null;
 
 // Prefer “nice” female-ish voices if present (varies by OS/browser)
 const PREFERRED_VOICE_NAME_HINTS = [
-  "Nicky", // macOS/iOS
+  "Nicky",
   "Victoria",
   "Karen",
   "Moira",
@@ -25,23 +24,23 @@ const PREFERRED_VOICE_NAME_HINTS = [
 function pickBestVoice(voices) {
   if (!voices || voices.length === 0) return null;
 
-  // Only consider English voices first (change if you want Spanish, etc.)
-  const english = voices.filter((v) => (v.lang || "").toLowerCase().startsWith("en"));
+  const english = voices.filter((v) =>
+    (v.lang || "").toLowerCase().startsWith("en")
+  );
   const pool = english.length ? english : voices;
 
-  // Try preferred name hints
   for (const hint of PREFERRED_VOICE_NAME_HINTS) {
-    const found = pool.find((v) => (v.name || "").toLowerCase().includes(hint.toLowerCase()));
+    const found = pool.find((v) =>
+      (v.name || "").toLowerCase().includes(hint.toLowerCase())
+    );
     if (found) return found;
   }
 
-  // Fallback: pick a “premium / enhanced / natural” if it exists
   const premium = pool.find((v) =>
     /premium|enhanced|natural/i.test(`${v.name} ${v.voiceURI}`)
   );
   if (premium) return premium;
 
-  // Final fallback: first in pool
   return pool[0];
 }
 
@@ -50,7 +49,6 @@ export default function Modal({ toggleModal, img, name, commentary }) {
   const [voices, setVoices] = useState([]);
   const [selectedVoiceURI, setSelectedVoiceURI] = useState("");
 
-  // Load voices (important: async + can change after first call)
   useEffect(() => {
     if (!synth) return;
 
@@ -58,7 +56,6 @@ export default function Modal({ toggleModal, img, name, commentary }) {
       const v = synth.getVoices();
       setVoices(v);
 
-      // set a default voice once voices exist
       if (!selectedVoiceURI && v.length) {
         const best = pickBestVoice(v);
         if (best) setSelectedVoiceURI(best.voiceURI);
@@ -66,8 +63,6 @@ export default function Modal({ toggleModal, img, name, commentary }) {
     };
 
     load();
-
-    // Some browsers fire this when voices become available
     synth.onvoiceschanged = load;
 
     return () => {
@@ -86,7 +81,6 @@ export default function Modal({ toggleModal, img, name, commentary }) {
     synth.cancel();
   };
 
-  // Cancel speech when modal unmounts/closes
   useEffect(() => {
     return () => stopSpeech();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -95,25 +89,19 @@ export default function Modal({ toggleModal, img, name, commentary }) {
   const speak = () => {
     if (!synth) return;
 
-    // If already speaking, resume if paused
     if (synth.speaking) {
       if (synth.paused) synth.resume();
       return;
     }
 
-    // Create a fresh utterance each time (more reliable)
     const u = new SpeechSynthesisUtterance(commentary || "");
     utterRef.current = u;
 
-    // Voice
     if (selectedVoice) u.voice = selectedVoice;
 
-    // Natural-ish settings (tweak to taste)
-    u.rate = 0.95;  // 0.9–1.05 tends to sound human
-    u.pitch = 1.1;  // slightly higher reads less robotic
+    u.rate = 0.95;
+    u.pitch = 1.1;
     u.volume = 1.0;
-
-    // Optional: ensure English pronunciation
     u.lang = selectedVoice?.lang || "en-US";
 
     synth.speak(u);
@@ -130,17 +118,56 @@ export default function Modal({ toggleModal, img, name, commentary }) {
   };
 
   return (
-    <div className="modal-content content-center object-center">
-      <h1 className="text-4xl font-bold dark:text-white text-sky-950 mb-2">{name}</h1>
+    <div
+      className="
+        fixed left-1/2 z-[60]
+        w-[92vw] max-w-[760px]
+        rounded-2xl
+        bg-white/95
+        shadow-2xl
+        px-4 pt-5 pb-4
+      "
+      style={{
+        // ✅ move down a bit (mobile + desktop)
+        top: "58%",
+        transform: "translate(-50%, -50%)",
+        // ✅ keep inside viewport
+        maxHeight: "84vh",
+      }}
+    >
+      {/* Close button */}
+      <button
+        type="button"
+        onClick={handleClose}
+        aria-label="Close"
+        className="absolute right-3 top-3 text-3xl text-sky-950 hover:opacity-80"
+      >
+        <AiOutlineCloseSquare />
+      </button>
 
+      {/* Title */}
+      <h1 className="text-center font-bold text-sky-950 mb-3 text-[22px] sm:text-3xl leading-tight">
+        {name}
+      </h1>
+
+      {/* Image */}
       <div className="flex justify-center">
-        <img src={img} alt="img" className="w-[500px] rounded-lg h-[290px] mb-2" />
+        <img
+          src={img}
+          alt="img"
+          className="
+            w-full max-w-[520px]
+            rounded-xl object-cover
+            h-[180px] sm:h-[240px] md:h-[290px]
+            mb-3
+          "
+        />
       </div>
 
-      {/* Voice picker (optional but helps a lot) */}
+      {/* Voice picker */}
       <div className="flex justify-center mb-2">
         <select
-          className="border rounded px-2 py-1 text-sm"
+          className="border rounded px-2 py-1 text-sm w-full max-w-[260px]"
           value={selectedVoiceURI}
           onChange={(e) => setSelectedVoiceURI(e.target.value)}
         >
@@ -154,27 +181,35 @@ export default function Modal({ toggleModal, img, name, commentary }) {
         </select>
       </div>
 
-      <p className="ml-3 inline-flex text-sky-800 text-lg">
-        <Link onClick={speak} className="inline-flex text-sky-800">
-          <HiPlay className="mt-1" /> PLAY
-        </Link>
-        &nbsp;&nbsp;&nbsp;
-        <Link className="inline-flex text-sky-800" onClick={pauseSpeech}>
-          <HiMiniPause className="mt-1" /> PAUSE
-        </Link>
-        &nbsp;&nbsp;&nbsp;
-        <Link onClick={stopSpeech} className="inline-flex text-sky-800">
-          <HiStop className="mt-1" /> STOP
-        </Link>
-      </p>
-
-      <div className="max-h-[170px] overflow-y-auto mt-[5px] mb-[10px]">
-        <p className="text-gray-500 dark:text-gray-400 h-[150px]">{commentary}</p>
+      {/* Controls */}
+      <div className="flex justify-center">
+        <p className="inline-flex text-sky-800 text-base sm:text-lg">
+          <Link onClick={speak} className="inline-flex text-sky-800">
+            <HiPlay className="mt-1" /> PLAY
+          </Link>
+          &nbsp;&nbsp;&nbsp;
+          <Link className="inline-flex text-sky-800" onClick={pauseSpeech}>
+            <HiMiniPause className="mt-1" /> PAUSE
+          </Link>
+          &nbsp;&nbsp;&nbsp;
+          <Link onClick={stopSpeech} className="inline-flex text-sky-800">
+            <HiStop className="mt-1" /> STOP
+          </Link>
+        </p>
       </div>
 
-      <button onClick={handleClose} className="close-modal">
-        <AiOutlineCloseSquare />
-      </button>
+      {/* Commentary (responsive scroll area) */}
+      <div
+        className="mt-3 overflow-y-auto pr-1"
+        style={{
+          // ✅ adapts to screen; keeps modal from growing too tall
+          maxHeight: "22vh",
+        }}
+      >
+        <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
+          {commentary}
+        </p>
+      </div>
     </div>
   );
 }

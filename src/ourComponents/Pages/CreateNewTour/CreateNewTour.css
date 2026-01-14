@@ -1,86 +1,134 @@
 @import url('https://fonts.googleapis.com/css?family=Dancing+Script');
 
+/* ================================
+   HERO / TYPOGRAPHY
+================================ */
 
 .luxury-font {
   font-family: 'Dancing Script', cursive;
-  font-size: 55px;
-  color: #333;
+  font-size: 3.2rem;
   font-weight: bold;
+  line-height: 1.1;
 }
 
-.dancing-script {
-  font-family: 'Dancing Script', cursive;
-  font-size: 55px;
+/* Hero band with gradient background */
+.hero-band {
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    #facc15 0%,
+    #fb923c 45%,
+    #ef4444 100%
+  );
+  padding: 32px 16px;
 }
 
-.full-background-color {
-  background-color: rgb(248 150 28);
+.hero-band-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
 }
+
+.hero-title {
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+}
+
+.hero-description {
+  max-width: 900px;
+  margin: 0 auto;
+  white-space: normal;
+  word-break: normal;
+  line-height: 1.6;
+}
+
+/* ================================
+   BACKGROUND IMAGE SECTION
+================================ */
 
 .background-image {
   background-image: url('../../../assets/createNewTourPhotos/solo_traveler.jpg');
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: top center;
-  background-attachment: fixed;
-  padding-top: 80px;
-  padding-bottom: 0px;
+  background-position: center center;
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
+  padding-top: 80px;
+  padding-bottom: 80px;
 }
 
-.custom-text {
-  font-size: 25px;
-  font-weight: bold;
-  color: #fff;
+/* Content wrapper to prevent over-wide layouts */
+.content-container {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
-.generator-directions {
-  margin: 0px 150px 25px 150px;
-}
-
-.container {
-}
+/* ================================
+   FORM / TABLE AREA
+================================ */
 
 .fields-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center; 
-  padding: 15px;
-  left: 200px;
-  top: 0px;
-  background-color: rgba(255, 255, 255, 0.754);
-  width: 385px;
+  gap: 12px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 380px;
 }
 
-@media screen and (max-width: 576px) {
-
-  .fields-container {
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-  }
-
-  .input {
-    /* width: 100vw; */
-  }
-
-  .field {
-    box-sizing: border-box;
-    padding: 0;
-    width: 100vw;
-    height: auto;
-  }
-}
-
+/* Inputs */
 .input {
-  padding: 0.5rem;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+/* Wrapper for each input row */
+.field {
   width: 100%;
 }
 
-.field {
-  box-sizing: border-box;
-  width: 350px;
-  height: 55px;
+/* ================================
+   RESPONSIVE FIXES
+================================ */
+
+/* Mobile (phones) */
+@media screen and (max-width: 640px) {
+  .luxury-font {
+    font-size: 2.4rem;
+  }
+
+  .hero-band {
+    padding: 24px 12px;
+  }
+
+  .hero-description {
+    font-size: 0.95rem;
+  }
+
+  .fields-container {
+    max-width: 92vw;
+  }
+
+  .background-image {
+    background-position: top center;
+    padding-top: 60px;
+  }
+}
+
+/* Tablets */
+@media screen and (min-width: 641px) and (max-width: 1024px) {
+  .fields-container {
+    max-width: 420px;
+  }
+}
+
+/* Large screens */
+@media screen and (min-width: 1280px) {
+  .background-image {
+    background-position: center center;
+  }
 }

@@ -130,7 +130,15 @@ export default function TourIndex() {
   };
 
   return (
-    <section className="gradient-day-to-night pt-[210px] pb-[100px]">
+    <section
+  className="
+    gradient-day-to-night
+    pt-[210px] pb-[100px]
+    w-screen
+    relative left-1/2 right-1/2
+    -ml-[50vw] -mr-[50vw]
+  "
+>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-extrabold luxury-font drop-shadow-lg">
           Discover the World's Wonders
