@@ -488,7 +488,7 @@ export default function CreateNewTour() {
                   />
                 </div>
 
-                <div className="field mb-3">
+                <div className="field mb-0">
                   <input
                     type="text"
                     className="input rounded-lg border"
@@ -499,7 +499,7 @@ export default function CreateNewTour() {
                   />
                 </div>
 
-                <div className="field mb-3">
+                <div className="field mb-0">
                   <input
                     type="text"
                     className="input rounded-lg border"
@@ -510,7 +510,7 @@ export default function CreateNewTour() {
                   />
                 </div>
 
-                <div className="field mb-3">
+                <div className="field mb-0">
                   <input
                     type="text"
                     className="input rounded-lg border"
@@ -521,7 +521,7 @@ export default function CreateNewTour() {
                   />
                 </div>
 
-                <div className="field mb-3">
+                <div className="field mb-0">
                   <select
                     className="input rounded-lg border"
                     value={tour.duration}
@@ -537,7 +537,7 @@ export default function CreateNewTour() {
                   </select>
                 </div>
 
-                <div className="field mb-3">
+                <div className="field mb-0">
                   <select
                     className="input rounded-lg border"
                     value={tour.difficulty}
@@ -570,7 +570,7 @@ export default function CreateNewTour() {
                     <option value="Pubs">Pubs</option>
                   </select>
 
-                  <div className="mb-3 text-center">
+                  <div className="mb-0 text-center">
                     <button
                       onClick={handleSubmit}
                       disabled={!tour.city || isLoading}
