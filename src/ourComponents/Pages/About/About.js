@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, useAnimation, useScroll } from "framer-motion";
 import JosephPhoto from "../../../assets/aboutPhotos/JosephR.png";
@@ -7,7 +7,6 @@ import JacquelinePhoto from "../../../assets/aboutPhotos/JacquelineP.png";
 import MarkPhoto from "../../../assets/aboutPhotos/Mark.jpg";
 import githubJPEG from "../../../assets/aboutPhotos/github.jpeg";
 import linkedinPNG from "../../../assets/aboutPhotos/linkedin.png";
-import marker from "../../../assets/aboutPhotos/markerSite.png";
 import "../About/About.css";
 
 function About() {
@@ -49,8 +48,6 @@ function About() {
     },
   ];
   const { scrollY } = useScroll();
-
-  const scrollContainerRef = useRef(null);
   const scrollControls = useAnimation();
 
   useEffect(() => {
@@ -81,150 +78,136 @@ function About() {
     relative left-1/2 right-1/2
     -ml-[50vw] -mr-[50vw]
     flex justify-center
-    mt-16 lg:mt-24
+    mt-[50px] sm:mt-[50px] lg:mt-[75px]
   "
     >
-      <div className="container mx-auto px-4">
-        <div className="about p-4">
-          <div className="app-summary-container bg-cyan-200 rounded-lg">
-            <img src={marker} alt="markerPin" className="markerPin" />
-            &nbsp;&nbsp;&nbsp;
-            <strong className="luxury-font font-size text-sky-950 drop-shadow-lg">
-              City Whisperer
-            </strong>
-            <br />
-            <p className="text-lg font-medium p text-sky-950 drop-shadow-lg">
-              Introduced in August 2023 as a capstone project, redefines the way
-              travelers experience cities. This app empowers tourists with
-              pre-planned walking routes and points of interest, complemented by
-              audio commentary, facilitating efficient and immersive city
-              exploration. By providing valuable insights and a user-friendly
-              interface, City Whisperer enhances the overall travel experience,
-              enabling users to make the most of their visits while enjoying the
-              freedom of self-guided tours. It's the perfect companion for
-              travelers seeking both convenience and adventure on their
-              journeys.
-            </p>
-            <br />
-            <img src={marker} alt="markerPin" className="markerPin" />
-            &nbsp;&nbsp;&nbsp;
-            <strong className="luxury-font font-size text-sky-950 drop-shadow-lg">
-              The Features
-            </strong>
-            <p className="text-lg p font-medium text-sky-950 drop-shadow-lg">
-              City Whisperer features include AI-generated walking tours,
-              customizable filters, and seamless Google Maps integration, you
-              can explore cities like never before. Enjoy audio commentary
-              through Text-to-Speech (TTS). And in the later future the team
-              will integrate secure and convenient login options for all users.
-            </p>
-            <br />
-            <img src={marker} alt="markerPin" className="markerPin" />
-            &nbsp;&nbsp;&nbsp;
-            <strong className="luxury-font font-size text-sky-950 drop-shadow-lg">
-              Our Mission
-            </strong>
-            <br />
-            <p className="text-lg p font-medium text-sky-950 drop-shadow-lg">
-              Our mission is to empower travelers to experience cities like
-              never before. We believe in enhancing the journey by offering
-              self-guided walking tours that are not only informative but also
-              deeply personalized. Our goal is to provide users with the freedom
-              to explore at their own pace, uncover hidden gems, and connect
-              with the culture and history of the places they visit. We're
-              dedicated to curating an ever-growing library of AI-generated
-              tours, fostering a sense of discovery, and making travel more
-              accessible and enriching for everyone. City Whisperer is on a
-              mission to redefine city exploration, one step at a time.
-            </p>
-            <br />
-            <img src={marker} alt="markerPin" className="markerPin" />
-            &nbsp;&nbsp;&nbsp;
-            <strong className="luxury-font font-size text-sky-950 drop-shadow-lg">
-              Our Development Team
-            </strong>
-            <br />
-            <p className="text-lg p font-medium text-sky-950 drop-shadow-lg">
-              Our team is a dynamic and passionate group of full-stack
-              developers, each bringing their unique skills and backgrounds to
-              the project. Together, this dedicated team is committed to
-              redefining city exploration through AI-generated walking tours,
-              making travel more enriching and accessible for all.
-            </p>
+      <div className="w-full max-w-5xl">
+        {/* CONTENT PANEL */}
+        <div className="p-2 sm:p-4">
+          <div
+            className="
+            rounded-2xl
+            bg-white/90
+            backdrop-blur-md
+            p-4 sm:p-6
+            w-full
+            max-w-3xl
+            mx-auto
+            shadow-xl
+          "
+          >
+            {/* City Whisperer */}
+            <div className="flex items-start gap-3">
+              <div className="flex-1">
+                <h1 className="luxury-font text-sky-950 text-3xl sm:text-4xl mb-2">
+                  City Whisperer
+                </h1>
+
+                <p className="text-sm sm:text-base font-medium text-sky-900 leading-relaxed">
+                  Introduced in August 2023 as a capstone project, City
+                  Whisperer redefines the way travelers experience cities. This
+                  app empowers tourists with pre-planned walking routes and
+                  points of interest, complemented by audio commentary,
+                  facilitating efficient and immersive city exploration. By
+                  providing valuable insights and a user-friendly interface,
+                  City Whisperer enhances the overall travel experience,
+                  enabling users to make the most of their visits while enjoying
+                  the freedom of self-guided tours.
+                </p>
+              </div>
+            </div>
+
+            {/* Features */}
+            <div className="mt-6 flex items-start gap-3">
+              <div className="flex-1">
+                <h2 className="luxury-font text-sky-950 text-2xl sm:text-3xl mb-2">
+                  The Features
+                </h2>
+
+                <p className="text-sm sm:text-base font-medium text-sky-900 leading-relaxed">
+                  City Whisperer features AI-generated walking tours,
+                  customizable filters, and seamless Google Maps integration.
+                  Explore cities like never before and enjoy audio commentary
+                  through Text-to-Speech (TTS), with more features planned for
+                  the future.
+                </p>
+              </div>
+            </div>
+
+            {/* Mission */}
+            <div className="mt-6 flex items-start gap-3">
+              <div className="flex-1">
+                <h2 className="luxury-font text-sky-950 text-2xl sm:text-3xl mb-2">
+                  Our Mission
+                </h2>
+
+                <p className="text-sm sm:text-base font-medium text-sky-900 leading-relaxed">
+                  Our mission is to empower travelers to explore cities at their
+                  own pace. We focus on personalization, discovery, and
+                  accessibility — helping users uncover hidden gems and connect
+                  deeply with the culture and history of every destination.
+                </p>
+              </div>
+            </div>
+
+            {/* Team */}
+            <div className="mt-6 flex items-start gap-3">
+              <div className="flex-1">
+                <h2 className="luxury-font text-sky-950 text-2xl sm:text-3xl mb-2">
+                  Our Development Team
+                </h2>
+
+                <p className="text-sm sm:text-base font-medium text-sky-900 leading-relaxed">
+                  Our team is a passionate group of full-stack developers
+                  working together to redefine city exploration through
+                  thoughtful design and AI-powered experiences.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="flex flex-col items-center">
-          <div className="team-container rounded-lg">
-            <img
-              src={marker}
-              alt="markerPin"
-              className="markerPin"
-              style={{ width: "24px", height: "24px" }}
-            />
-            &nbsp;
-            <h1 className="font-bold text-xl text-center my-0 dancing-script text-sky-950 drop-shadow-lg p-2">
-              Meet the Team
-            </h1>
-          </div>
-          <div className="team-members mt-4">
+
+        {/* TEAM SECTION */}
+        <div className="mt-8 sm:mt-10 flex flex-col items-center">
+          <div className="mt-6 w-full max-w-3xl flex flex-col gap-6">
             {teamMembers.map((member, index) => (
-              <div key={index} className="team-member-card">
-                <h5 className="text-3xl font-bold leading-tight text-sky-950">
+              <div
+                key={index}
+                className="rounded-xl bg-white/95 p-4 sm:p-6 shadow-lg"
+              >
+                <h4 className="text-xl sm:text-2xl font-bold text-sky-950">
                   {member.name}
-                </h5>
-                <div className="mt-4 relative overflow-hidden bg-cover bg-no-repeat centered-photo">
+                </h4>
+
+                <div className="mt-4 flex justify-center">
                   <motion.img
-                    className="rounded-lg medium-photo"
                     src={member.photo}
-                    style={{ height: "200px", width: "200px" }}
                     alt={member.name}
-                    initial={{ opacity: 0, y: 100 }} // Initial animation state
-                    animate={scrollControls} // the animation controls
-                    transition={{ duration: 0.5 }} // Animation duration
+                    className="rounded-xl object-cover"
+                    style={{ width: 160, height: 160 }}
+                    initial={{ opacity: 0, y: 80 }}
+                    animate={scrollControls}
+                    transition={{ duration: 0.5 }}
                   />
                 </div>
-                <div className="p-4">
-                  <div
-                    ref={scrollContainerRef}
-                    className="scrollable-content" //custom styling for scrolling content
-                  >
-                    <motion.p
-                      className="text-base bio-paragraph font-semibold text-sky-950"
-                      initial={{ opacity: 0, y: 100 }}
-                      animate={scrollControls}
-                      transition={{ duration: 0.5, delay: 0.2 }}
-                      style={{ textAlign: "left" }}
-                    >
-                      {member.bio}
-                    </motion.p>
 
-                    <motion.div
-                      initial={{ opacity: 0, y: 100 }} // Initial animation state
-                      animate={scrollControls} // animation controls
-                      transition={{ duration: 0.5, delay: 0.4 }} // Animation duration and delay
-                    >
-                      <Link
-                        to={member.github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="pointer-events-auto mr-5 inline-block cursor-pointer rounded text-base font-normal leading-normal text-primary transition duration-150 ease-in-out hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-0 active:text-primary-700"
-                      >
-                        <img src={githubJPEG} alt="github Logo" width={36} />
-                      </Link>
-                      <Link
-                        to={member.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="pointer-events-auto inline-block cursor-pointer rounded text-base font-normal leading-normal text-primary transition duration-150 ease-in-out hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-0 active:text-primary-700"
-                      >
-                        <img src={linkedinPNG} alt="LinkedIn Logo" width={40} />
-                      </Link>
-                    </motion.div>
-                  </div>
+                <p className="mt-4 text-sm sm:text-base font-medium text-sky-900 leading-relaxed">
+                  {member.bio}
+                </p>
+
+                <div className="mt-4 flex gap-4">
+                  <Link to={member.github} target="_blank">
+                    <img src={githubJPEG} alt="GitHub" width={32} />
+                  </Link>
+                  <Link to={member.linkedin} target="_blank">
+                    <img src={linkedinPNG} alt="LinkedIn" width={36} />
+                  </Link>
                 </div>
               </div>
             ))}
           </div>
+
+          <div className="h-10" />
         </div>
       </div>
     </div>
