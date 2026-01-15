@@ -224,18 +224,18 @@ export default function TourIndex() {
                 <motion.div
                   key={tour.id}
                   className="
-      relative cursor-pointer
-      mx-auto lg:mx-0
+                  relative cursor-pointer
+                  mx-auto lg:mx-0
 
-      w-[92%] max-w-[420px]          /* ✅ mobile: card-like width, not full screen */
-      sm:w-[420px]                  /* ✅ tablet+ */
-      h-[420px] sm:h-[500px]
+                  w-[92%] max-w-[420px]          /* mobile: card-like width, not full screen */
+                  sm:w-[420px]                  /* tablet+ */
+                  h-[420px] sm:h-[500px]
 
-      bg-cover bg-center rounded-[20px]
-      overflow-hidden
+                  bg-cover bg-center rounded-[20px]
+                  overflow-hidden
 
-      lg:snap-start lg:flex-shrink-0
-    "
+                  lg:snap-start lg:flex-shrink-0
+                  "
                   variants={cardVariants}
                   initial="collapsed"
                   animate={expanded ? "expanded" : "collapsed"}
