@@ -476,8 +476,8 @@ export default function CreateNewTour() {
           <div className="flex items-start justify-evenly gap-20">
             {/* FORM COLUMN */}
             <div className="self-start !mt-0 !pt-0">
-              <div className="fields-container rounded-lg !mt-0 !pt-0">
-                <div className="field mb-3">
+              <div className="fields-container rounded-lg !mt-0 !pt-5">
+                <div className="field mb-0">
                   <input
                     type="text"
                     className="input rounded-lg border"
@@ -553,7 +553,7 @@ export default function CreateNewTour() {
                   </select>
                 </div>
 
-                <div className="field mb-16">
+                <div className="field mb-0">
                   <select
                     className="input rounded-lg border"
                     value={tour.theme}
