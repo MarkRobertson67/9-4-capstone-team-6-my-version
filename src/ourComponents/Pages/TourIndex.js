@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import TourCard from "./TourCard";
+import loadingAnimation from "../../assets/S-Loop_transnparent.gif";
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -79,10 +80,6 @@ export default function TourIndex() {
     }
   };
 
-  /**
-   * Smoothly scroll JUST ENOUGH so card is fully visible.
-   * Does NOT center (only fixes overflow on either side).
-   */
   const ensureCardFullyVisible = (cardEl) => {
     const scroller = scrollerRef.current;
     if (!scroller || !cardEl) return;
@@ -131,14 +128,14 @@ export default function TourIndex() {
 
   return (
     <section
-  className="
+      className="
     gradient-day-to-night
     pt-[210px] pb-[100px]
     w-screen
     relative left-1/2 right-1/2
     -ml-[50vw] -mr-[50vw]
   "
->
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-extrabold luxury-font drop-shadow-lg">
           Discover the World's Wonders
@@ -177,18 +174,36 @@ export default function TourIndex() {
           ›
         </button>
 
-        {/* Horizontal scroller */}
+        {/* Responsive scroller: vertical on mobile, horizontal on lg+ */}
         <div
           ref={scrollerRef}
-          className="flex gap-5 overflow-x-auto overscroll-x-contain
-             scroll-smooth snap-x snap-mandatory
-             py-2 px-2
-             [scrollbar-width:thin]"
+          className="
+    grid grid-cols-1 gap-6
+    overflow-visible
+
+    lg:flex lg:gap-5
+    lg:overflow-x-auto lg:overscroll-x-contain
+    lg:scroll-smooth lg:snap-x lg:snap-mandatory
+    lg:py-2 lg:px-2
+    lg:[scrollbar-width:thin]
+  "
         >
           {/* LOADING */}
           {loading && (
-            <div className="w-full flex items-center justify-center py-24">
-              <div className="h-12 w-12 rounded-full border-4 border-white/40 border-t-white animate-spin" />
+            <div className="w-full flex items-center justify-center py-16 sm:py-20">
+              <div className="flex flex-col items-center px-4">
+                <div className="rounded-md bg-yellow-100/90 border border-yellow-300 px-4 py-3 text-xs sm:text-sm text-yellow-900 text-center animate-pulse max-w-md">
+                  ⏳ Loading tours...
+                  <br />
+                  Please wait while we fetch the latest tours.
+                </div>
+
+                <img
+                  src={loadingAnimation}
+                  alt="Loading..."
+                  className="w-28 sm:w-36 mt-4"
+                />
+              </div>
             </div>
           )}
 
@@ -208,9 +223,19 @@ export default function TourIndex() {
               return (
                 <motion.div
                   key={tour.id}
-                  className="relative snap-start flex-shrink-0 cursor-pointer
-                   h-[500px] bg-cover bg-center rounded-[20px]
-                   overflow-hidden"
+                  className="
+      relative cursor-pointer
+      mx-auto lg:mx-0
+
+      w-[92%] max-w-[420px]          /* ✅ mobile: card-like width, not full screen */
+      sm:w-[420px]                  /* ✅ tablet+ */
+      h-[420px] sm:h-[500px]
+
+      bg-cover bg-center rounded-[20px]
+      overflow-hidden
+
+      lg:snap-start lg:flex-shrink-0
+    "
                   variants={cardVariants}
                   initial="collapsed"
                   animate={expanded ? "expanded" : "collapsed"}
