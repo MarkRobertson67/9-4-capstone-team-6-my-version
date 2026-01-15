@@ -476,8 +476,8 @@ export default function CreateNewTour() {
           <div className="flex items-start justify-evenly gap-20">
             {/* FORM COLUMN */}
             <div className="self-start !mt-0 !pt-0">
-              <div className="fields-container rounded-lg !mt-0 !pt-0">
-                <div className="field mb-3">
+              <div className="fields-container rounded-lg !mt-0 !pt-5">
+                <div className="field mb-0">
                   <input
                     type="text"
                     className="input rounded-lg border"
@@ -488,7 +488,7 @@ export default function CreateNewTour() {
                   />
                 </div>
 
-                <div className="field mb-3">
+                <div className="field mb-0">
                   <input
                     type="text"
                     className="input rounded-lg border"
@@ -499,7 +499,7 @@ export default function CreateNewTour() {
                   />
                 </div>
 
-                <div className="field mb-3">
+                <div className="field mb-0">
                   <input
                     type="text"
                     className="input rounded-lg border"
@@ -510,7 +510,7 @@ export default function CreateNewTour() {
                   />
                 </div>
 
-                <div className="field mb-3">
+                <div className="field mb-0">
                   <input
                     type="text"
                     className="input rounded-lg border"
@@ -521,7 +521,7 @@ export default function CreateNewTour() {
                   />
                 </div>
 
-                <div className="field mb-3">
+                <div className="field mb-0">
                   <select
                     className="input rounded-lg border"
                     value={tour.duration}
@@ -537,7 +537,7 @@ export default function CreateNewTour() {
                   </select>
                 </div>
 
-                <div className="field mb-3">
+                <div className="field mb-0">
                   <select
                     className="input rounded-lg border"
                     value={tour.difficulty}
@@ -553,7 +553,7 @@ export default function CreateNewTour() {
                   </select>
                 </div>
 
-                <div className="field mb-16">
+                <div className="field mb-0">
                   <select
                     className="input rounded-lg border"
                     value={tour.theme}
@@ -570,7 +570,7 @@ export default function CreateNewTour() {
                     <option value="Pubs">Pubs</option>
                   </select>
 
-                  <div className="mb-3 text-center">
+                  <div className="mb-0 text-center">
                     <button
                       onClick={handleSubmit}
                       disabled={!tour.city || isLoading}
