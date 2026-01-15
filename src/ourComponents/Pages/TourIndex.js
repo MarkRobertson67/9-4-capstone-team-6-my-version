@@ -122,15 +122,38 @@ export default function TourIndex() {
   };
 
   const handleShowClick = (index, cardEl) => {
-    setExpandedIndex((prev) => (prev === index ? null : index));
-    ensureDuringAnimation(cardEl);
-  };
+  setExpandedIndex((prev) => {
+    const next = prev === index ? null : index;
+
+    if (next === index && cardEl) {
+      setTimeout(() => {
+        // MOBILE ONLY
+        if (window.innerWidth < 1024) {
+          const rect = cardEl.getBoundingClientRect();
+          const cardCenterX = rect.left + rect.width / 2;
+          const viewportCenterX = window.innerWidth / 2;
+
+          window.scrollBy({
+            left: cardCenterX - viewportCenterX,
+            behavior: "smooth",
+          });
+        } else {
+          // desktop behavior stays exactly the same
+          ensureDuringAnimation(cardEl);
+        }
+      }, 50);
+    }
+
+    return next;
+  });
+};
+
 
   return (
     <section
       className="
     gradient-day-to-night
-    pt-[210px] pb-[100px]
+    pt-[200px] pb-[100px]
     w-screen
     relative left-1/2 right-1/2
     -ml-[50vw] -mr-[50vw]
@@ -235,7 +258,9 @@ export default function TourIndex() {
                   overflow-hidden
 
                   lg:snap-start lg:flex-shrink-0
+                  max-lg:!w-[92%] max-lg:!max-w-[420px]
                   "
+
                   variants={cardVariants}
                   initial="collapsed"
                   animate={expanded ? "expanded" : "collapsed"}
