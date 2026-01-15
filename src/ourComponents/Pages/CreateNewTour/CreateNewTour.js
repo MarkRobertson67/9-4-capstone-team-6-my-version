@@ -24,61 +24,63 @@ const config = {
  * Calls backend: POST /ai/generate-commentary
  * Adds retry + 15s timeout
  */
-const generatePOICommentary = async (poiName, cityName, countryName) => {
-  let retries = 0;
 
-  const generateCommentary = async (retryCount) => {
+const generatePOICommentary = async (
+  poiName,
+  cityName,
+  countryName,
+  {
+    maxAttempts = 5,
+    timeoutMs = 15000,
+    baseDelayMs = 800, // backoff base
+  } = {}
+) => {
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      const commentaryPromise = new Promise(async (resolve, reject) => {
-        try {
-          const response = await axios.post(
-            `${config.apiUrl}/ai/generate-commentary`,
-            { poiName, cityName, countryName },
-            { headers: { "Content-Type": "application/json" } }
-          );
+      console.log(
+        `Attempt ${attempt}/${maxAttempts}: Generating commentary for "${poiName}" in ${cityName}, ${countryName}...`
+      );
 
-          const commentary = response.data?.commentary;
+      const request = axios.post(
+        `${config.apiUrl}/ai/generate-commentary`,
+        { poiName, cityName, countryName },
+        { headers: { "Content-Type": "application/json" } }
+      );
 
-          console.log("Generated Commentary:", commentary);
-
-          if (commentary) resolve(commentary);
-          else reject("Empty commentary");
-        } catch (error) {
-          reject(error);
-        }
-      });
-
-      // 15 second timeout
-      const commentaryPromiseWithTimeout = Promise.race([
-        commentaryPromise,
-        new Promise((_, reject) => setTimeout(() => reject("Timeout"), 15000)),
+      const res = await Promise.race([
+        request,
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Timeout")), timeoutMs)
+        ),
       ]);
 
-      return await commentaryPromiseWithTimeout;
-    } catch (error) {
-      console.error(`Error generating commentary for ${poiName}:`, error);
+      const commentary = res?.data?.commentary;
+
+      if (commentary && String(commentary).trim().length > 0) {
+        console.log("Generated Commentary:", commentary);
+        return commentary;
+      }
+
+      throw new Error("Empty commentary");
+    } catch (err) {
+      console.error(
+        `Commentary attempt ${attempt} failed for "${poiName}":`,
+        err?.message || err
+      );
+
+      // If last attempt, stop.
+      if (attempt === maxAttempts) break;
+
+      // Backoff before retry (800ms, 1600ms, 2400ms, ...)
+      const delay = baseDelayMs * attempt;
+      await sleep(delay);
     }
-
-    retries++;
-    console.log(`Attempt ${retryCount + 1}: Retrying...`);
-    return generateCommentary(retryCount + 1);
-  };
-
-  while (retries < 5) {
-    console.log(
-      `Attempt ${
-        retries + 1
-      }: Generating commentary for "${poiName}" in ${cityName}, ${countryName}...`
-    );
-
-    const commentary = await generateCommentary(retries);
-    if (commentary) return commentary;
-
-    retries++;
   }
 
   console.error(
-    `Failed to generate commentary for ${poiName} after 5 retries.`
+    `Failed to generate commentary for "${poiName}" after ${maxAttempts} attempts.`
   );
   return "";
 };
@@ -430,7 +432,11 @@ export default function CreateNewTour() {
           tour.country
         );
 
-        await insertCommentary(poiId, poi, commentary);
+        if (commentary && commentary.trim().length > 0) {
+          await insertCommentary(poiId, poi, commentary);
+        } else {
+          console.warn(`Skipping commentary insert for "${poi}" (empty).`);
+        }
       }
 
       setIsLoading(false);
