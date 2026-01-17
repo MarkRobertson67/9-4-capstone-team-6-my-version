@@ -81,8 +81,13 @@ export default function EndTour({
   const handleSubmit = async () => {
     if (sending) return;
 
-    if (!message.trim() || rating === 0) {
-      alert("Please leave a message and rating.");
+    if (!message.trim()) {
+      alert("Please leave a message.");
+      return;
+    }
+
+    if (mode !== "contact" && rating === 0) {
+      alert("Please leave a rating.");
       return;
     }
 
@@ -184,15 +189,19 @@ export default function EndTour({
               : "Safe travels! Thank you for exploring with us ✨"}
           </p>
 
-          <div className="flex items-center justify-center mt-1 mb-2">
-            {renderStars()}
-          </div>
+          {mode !== "contact" && (
+            <>
+              <div className="flex items-center justify-center mt-1 mb-2">
+                {renderStars()}
+              </div>
 
-          <div className="text-gray-600 text-xs mb-2 text-center">
-            <span>1 - Poor</span> | <span>2 - Fair</span> |{" "}
-            <span>3 - Average</span> | <span>4 - Very Good</span> |{" "}
-            <span>5 - Excellent</span>
-          </div>
+              <div className="text-gray-600 text-xs mb-2 text-center">
+                <span>1 - Poor</span> | <span>2 - Fair</span> |{" "}
+                <span>3 - Average</span> | <span>4 - Very Good</span> |{" "}
+                <span>5 - Excellent</span>
+              </div>
+            </>
+          )}
 
           <input
             className="w-full p-2 border rounded-md mb-2"
