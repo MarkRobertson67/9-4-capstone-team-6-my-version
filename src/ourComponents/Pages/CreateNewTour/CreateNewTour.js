@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import loadingAnimation from "../../../assets/S-Loop_transnparent.gif";
@@ -220,6 +220,26 @@ export default function CreateNewTour() {
   const [cityPhoto, setCityPhoto] = useState(null);
   const navigate = useNavigate();
   const [isFetchingImage, setIsFetchingImage] = useState(false);
+  const loadingSectionRef = useRef(null);
+
+  useEffect(() => {
+    if ((isLoading || isFetchingImage) && window.innerWidth < 1024) {
+      setTimeout(() => {
+        if (loadingSectionRef.current) {
+          const yOffset = -120; // 👈 scroll UP a bit so alert is fully visible
+          const y =
+            loadingSectionRef.current.getBoundingClientRect().top +
+            window.pageYOffset +
+            yOffset;
+
+          window.scrollTo({
+            top: y,
+            behavior: "smooth",
+          });
+        }
+      }, 150);
+    }
+  }, [isLoading, isFetchingImage]);
 
   // Parse: "1. Place (41.0000° N, 2.0000° E)"
   const parsePointsOfInterestAndCoordinates = (generatedTour) => {
@@ -600,7 +620,10 @@ export default function CreateNewTour() {
               {/* =======================
                 COLUMN 2 — LOADER
                ======================= */}
-              <div className="w-full lg:flex-1 flex justify-center">
+              <div
+                ref={loadingSectionRef}
+                className="w-full lg:flex-1 flex justify-center"
+              >
                 {(isLoading || isFetchingImage) && (
                   <div className="flex flex-col items-center">
                     <div className="rounded-md bg-yellow-100/90 border border-yellow-300 px-4 py-3 text-xs text-yellow-900 text-center animate-pulse max-w-md">
