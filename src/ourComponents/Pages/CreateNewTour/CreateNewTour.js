@@ -451,180 +451,200 @@ export default function CreateNewTour() {
   return (
     <div
       className="
-    gradient-day-to-night
-    min-h-screen
-    w-screen
-    relative left-1/2 right-1/2
-    -ml-[50vw] -mr-[50vw]
-    pt-[200px]
-  "
+      gradient-day-to-night
+      min-h-screen
+      w-screen
+      relative left-1/2 right-1/2
+      -ml-[50vw] -mr-[50vw]
+      pt-[200px]
+    "
     >
-      <div className="">
+      <div>
         <h1 className="luxury-font text-3xl text-center mb-4 font-extrabold text-sky-950 drop-shadow-lg">
           Ready to Explore?
         </h1>
 
-        <p className="generator-directions text-lg font-semibold text-sky-950 drop-shadow-lg">
+        <p className="generator-directions text-lg font-semibold text-sky-950 drop-shadow-lg text-center max-w-5xl mx-auto">
           Explore the world and create your own adventure! Whether you're a
           history buff, a foodie, or an outdoor enthusiast, there's a unique
           journey waiting for you. Uncover hidden gems, savor local flavors, and
           embark on unforgettable experiences.
         </p>
 
-        <div className="content-container background-image rounded-lg">
-          {/* ✅ items-start + self-start + !mt-0 kills any CSS top margin mismatch */}
-          <div className="flex items-start justify-evenly gap-20">
-            {/* FORM COLUMN */}
-            <div className="self-start !mt-0 !pt-0">
-              <div className="fields-container rounded-lg !mt-0 !pt-5">
-                <div className="field mb-0">
-                  <input
-                    type="text"
-                    className="input rounded-lg border"
-                    placeholder="Enter a City to Explore"
-                    name="city"
-                    value={tour.city}
-                    onChange={handleTextChange}
-                  />
-                </div>
+        {/* =======================
+          MAIN CONTENT AREA
+         ======================= */}
+        <div className="content-container background-image rounded-lg mt-12">
+          <div className="mx-auto w-full max-w-[1400px] px-10 lg:px-16">
+            <div className="flex flex-col lg:flex-row items-start justify-between gap-10">
+              {/* =======================
+                COLUMN 1 — FORM
+               ======================= */}
+              <div className="w-full lg:flex-1 flex justify-center lg:justify-start">
+                <div className="fields-container rounded-lg">
+                  <div className="field">
+                    <input
+                      type="text"
+                      className="input rounded-lg border"
+                      placeholder="Enter a City to Explore"
+                      name="city"
+                      value={tour.city}
+                      onChange={handleTextChange}
+                    />
+                  </div>
 
-                <div className="field mb-0">
-                  <input
-                    type="text"
-                    className="input rounded-lg border"
-                    placeholder="Borough/Region if applicable"
-                    name="region"
-                    value={tour.region}
-                    onChange={handleTextChange}
-                  />
-                </div>
+                  <div className="field">
+                    <input
+                      type="text"
+                      className="input rounded-lg border"
+                      placeholder="Borough/Region if applicable"
+                      name="region"
+                      value={tour.region}
+                      onChange={handleTextChange}
+                    />
+                  </div>
 
-                <div className="field mb-0">
-                  <input
-                    type="text"
-                    className="input rounded-lg border"
-                    placeholder="State/County/Province if applicable"
-                    name="state"
-                    value={tour.state}
-                    onChange={handleTextChange}
-                  />
-                </div>
+                  <div className="field">
+                    <input
+                      type="text"
+                      className="input rounded-lg border"
+                      placeholder="State/County/Province if applicable"
+                      name="state"
+                      value={tour.state}
+                      onChange={handleTextChange}
+                    />
+                  </div>
 
-                <div className="field mb-0">
-                  <input
-                    type="text"
-                    className="input rounded-lg border"
-                    placeholder="Enter the Country"
-                    name="country"
-                    value={tour.country}
-                    onChange={handleTextChange}
-                  />
-                </div>
+                  <div className="field">
+                    <input
+                      type="text"
+                      className="input rounded-lg border"
+                      placeholder="Enter the Country"
+                      name="country"
+                      value={tour.country}
+                      onChange={handleTextChange}
+                    />
+                  </div>
 
-                <div className="field mb-0">
-                  <select
-                    className="input rounded-lg border"
-                    value={tour.duration}
-                    onChange={handleDropdownChange}
-                    id="duration"
-                  >
-                    <option value="" disabled>
-                      Select Day Duration
-                    </option>
-                    <option value="Full-day">Full-day</option>
-                    <option value="Half-day">Half-day</option>
-                    <option value="2 hours">2 hours</option>
-                  </select>
-                </div>
+                  <div className="field">
+                    <select
+                      className="input rounded-lg border"
+                      value={tour.duration}
+                      onChange={handleDropdownChange}
+                      id="duration"
+                    >
+                      <option value="" disabled>
+                        Select Day Duration
+                      </option>
+                      <option value="Full-day">Full-day</option>
+                      <option value="Half-day">Half-day</option>
+                      <option value="2 hours">2 hours</option>
+                    </select>
+                  </div>
 
-                <div className="field mb-0">
-                  <select
-                    className="input rounded-lg border"
-                    value={tour.difficulty}
-                    onChange={handleDropdownChange}
-                    id="difficulty"
-                  >
-                    <option value="" disabled>
-                      Select Walking Difficulty
-                    </option>
-                    <option value="Easy">Easy</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Hard">Hard</option>
-                  </select>
-                </div>
+                  <div className="field">
+                    <select
+                      className="input rounded-lg border"
+                      value={tour.difficulty}
+                      onChange={handleDropdownChange}
+                      id="difficulty"
+                    >
+                      <option value="" disabled>
+                        Select Walking Difficulty
+                      </option>
+                      <option value="Easy">Easy</option>
+                      <option value="Medium">Medium</option>
+                      <option value="Hard">Hard</option>
+                    </select>
+                  </div>
 
-                <div className="field mb-0">
-                  <select
-                    className="input rounded-lg border"
-                    value={tour.theme}
-                    onChange={handleDropdownChange}
-                    id="theme"
-                  >
-                    <option value="" disabled>
-                      Select Tour Theme
-                    </option>
-                    <option value="Historic">Historic</option>
-                    <option value="Scenic">Scenic</option>
-                    <option value="Fun">Fun</option>
-                    <option value="Museums">Museums</option>
-                    <option value="Pubs">Pubs</option>
-                  </select>
+                  <div className="field">
+                    <select
+                      className="input rounded-lg border"
+                      value={tour.theme}
+                      onChange={handleDropdownChange}
+                      id="theme"
+                    >
+                      <option value="" disabled>
+                        Select Tour Theme
+                      </option>
+                      <option value="Historic">Historic</option>
+                      <option value="Scenic">Scenic</option>
+                      <option value="Fun">Fun</option>
+                      <option value="Museums">Museums</option>
+                      <option value="Pubs">Pubs</option>
+                    </select>
+                  </div>
 
-                  <div className="mb-0 text-center">
+                  <div className="text-center">
                     <button
                       onClick={handleSubmit}
                       disabled={!tour.city || isLoading}
                       type="button"
-                      className="mt-6 inline-block rounded bg-[#183759] px-6 py-2 text-xs font-bold text-[#dbd4db] uppercase leading-normal transition duration-150 ease-in-out hover:bg-primary-600 hover:scale-110"
+                      className="
+                      mt-6 inline-block rounded
+                      bg-[#183759]
+                      px-6 py-2
+                      text-xs font-bold text-[#dbd4db]
+                      uppercase
+                      transition duration-150
+                      hover:scale-110
+                    "
                     >
                       Generate Walking Tour
                     </button>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* PREVIEW COLUMN */}
-            {isLoading && (
-              <div className="self-start !mt-0 !pt-0 w-[420px] flex flex-col items-center">
-                {cityPhoto ? (
-                  <img
-                    src={cityPhoto}
-                    alt={tour.city ? `${tour.city}` : "Tour image"}
-                    className="w-[420px] max-h-[550px] rounded-lg object-cover !mt-0"
-                    onError={(e) => {
-                      e.currentTarget.src = NoTourImageAvailable;
-                    }}
-                  />
-                ) : (
-                  <div className="w-[420px] h-[300px] rounded-lg bg-gray-300/60 animate-pulse" />
+              {/* =======================
+                COLUMN 2 — LOADER
+               ======================= */}
+              <div className="w-full lg:flex-1 flex justify-center">
+                {(isLoading || isFetchingImage) && (
+                  <div className="flex flex-col items-center">
+                    <div className="rounded-md bg-yellow-100/90 border border-yellow-300 px-4 py-3 text-xs text-yellow-900 text-center animate-pulse max-w-md">
+                      ⏳ Please be patient while your tour is being created.
+                      <br />
+                      This process can take several minutes as we generate
+                      <br />
+                      the tour and detailed commentary for each stop.
+                    </div>
+
+                    <img
+                      src={loadingAnimation}
+                      alt="Loading..."
+                      className="w-56 lg:w-64 mt-4"
+                    />
+                  </div>
                 )}
               </div>
-            )}
+
+              {/* =======================
+                COLUMN 3 — CITY IMAGE
+               ======================= */}
+              <div className="w-full lg:flex-1 flex justify-center lg:justify-end">
+                {isLoading && (
+                  <div className="w-full max-w-[380px] md:max-w-[420px]">
+                    {cityPhoto ? (
+                      <img
+                        src={cityPhoto}
+                        alt={tour.city || "Tour preview"}
+                        className="w-full h-auto rounded-lg object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = NoTourImageAvailable;
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-[220px] rounded-lg bg-gray-300/60 animate-pulse" />
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Fullscreen overlay ONLY while fetching the image */}
-      {isFetchingImage && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-gray-800/50">
-          <div className="mt-[320px] flex flex-col items-center">
-            <div className="rounded-md bg-yellow-100/90 border border-yellow-300 px-4 py-3 text-xs text-yellow-900 text-center animate-pulse max-w-md">
-              ⏳ Please be patient while your tour is being created.
-              <br />
-              This process can take several minutes as we generate
-              <br />
-              the tour and detailed commentary for each stop.
-            </div>
-
-            <img
-              src={loadingAnimation}
-              alt="Loading..."
-              className="w-1/4 mt-4"
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

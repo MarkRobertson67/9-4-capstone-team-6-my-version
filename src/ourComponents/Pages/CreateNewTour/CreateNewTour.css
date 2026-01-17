@@ -1,9 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Dancing+Script');
 
-/* ================================
-   HERO / TYPOGRAPHY
-================================ */
-
+/* Typography */
 .luxury-font {
   font-family: 'Dancing Script', cursive;
   font-size: 3.2rem;
@@ -11,40 +8,7 @@
   line-height: 1.1;
 }
 
-/* Hero band with gradient background */
-.hero-band {
-  width: 100%;
-  background: linear-gradient(
-    90deg,
-    #facc15 0%,
-    #fb923c 45%,
-    #ef4444 100%
-  );
-  padding: 32px 16px;
-}
-
-.hero-band-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.hero-title {
-  font-size: clamp(2.2rem, 5vw, 3.6rem);
-}
-
-.hero-description {
-  max-width: 900px;
-  margin: 0 auto;
-  white-space: normal;
-  word-break: normal;
-  line-height: 1.6;
-}
-
-/* ================================
-   BACKGROUND IMAGE SECTION
-================================ */
-
+/* Background image section */
 .background-image {
   background-image: url('../../../assets/createNewTourPhotos/solo_traveler.jpg');
   background-size: cover;
@@ -56,17 +20,14 @@
   padding-bottom: 80px;
 }
 
-/* Content wrapper to prevent over-wide layouts */
+/* Content wrapper */
 .content-container {
   width: 100%;
   max-width: 1600px;
   margin: 0 auto;
 }
 
-/* ================================
-   FORM / TABLE AREA
-================================ */
-
+/* Form container */
 .fields-container {
   display: flex;
   flex-direction: column;
@@ -86,27 +47,14 @@
   font-size: 0.95rem;
 }
 
-/* Wrapper for each input row */
 .field {
   width: 100%;
 }
 
-/* ================================
-   RESPONSIVE FIXES
-================================ */
-
-/* Mobile (phones) */
+/* Responsive */
 @media screen and (max-width: 640px) {
   .luxury-font {
     font-size: 2.4rem;
-  }
-
-  .hero-band {
-    padding: 24px 12px;
-  }
-
-  .hero-description {
-    font-size: 0.95rem;
   }
 
   .fields-container {
@@ -119,14 +67,12 @@
   }
 }
 
-/* Tablets */
 @media screen and (min-width: 641px) and (max-width: 1024px) {
   .fields-container {
     max-width: 420px;
   }
 }
 
-/* Large screens */
 @media screen and (min-width: 1280px) {
   .background-image {
     background-position: center center;
