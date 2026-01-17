@@ -9,6 +9,8 @@ import CreateNewTour from './ourComponents/Pages/CreateNewTour/CreateNewTour';
 import TourIndex from './ourComponents/Pages/TourIndex';
 import TourLive from './ourComponents/Pages/TourLive';
 import EndTour from './ourComponents/Pages/EndTour/EndTour';
+import ScrollToTop from "./ourComponents/ScrollToTop";
+
 // Input this EndTour into TourLive.js has been finalized/populated
 
 import NavBar from './ourComponents/NavBar/NavBar';
@@ -20,12 +22,12 @@ function App() {
   return (
     <div className="App">
       <Router>
+        <ScrollToTop /> {/* ✅ GLOBAL SCROLL RESET */}
         <NavBar />
         <main>
           <div className="content-container">
             {/* Check App.css for content-container for padding */}
             <Routes>
-              <Route path="/" element={<Home />} />
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/createnewtour" element={<CreateNewTour />} />

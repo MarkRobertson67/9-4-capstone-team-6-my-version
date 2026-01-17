@@ -222,6 +222,7 @@ export default function CreateNewTour() {
   const [isFetchingImage, setIsFetchingImage] = useState(false);
   const loadingSectionRef = useRef(null);
 
+
   useEffect(() => {
     if ((isLoading || isFetchingImage) && window.innerWidth < 1024) {
       setTimeout(() => {
