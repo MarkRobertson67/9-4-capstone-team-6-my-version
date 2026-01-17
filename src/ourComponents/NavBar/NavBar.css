@@ -1,17 +1,19 @@
 .logo {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .logo img {
-  height: 75px;
+  height: auto;
+  max-height: 48px; /* desktop cap */
 }
 
-@media screen and ( max-width: 750px) {
+@media screen and (max-width: 750px) {
   .logo img {
-    height: 25px
+    max-height: 40px; /* mobile cap */
   }
 }
+
 
 .nav-link {
   font-size: 18px;
