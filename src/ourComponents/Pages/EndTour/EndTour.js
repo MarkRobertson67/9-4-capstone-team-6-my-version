@@ -11,7 +11,10 @@ const SERVICE_ID = process.env.REACT_APP_EMAILJS_SERVICE_ID;
 const TEMPLATE_ID = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
 const PUBLIC_KEY = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
 
-export default function EndTour() {
+export default function EndTour({
+  mode = "endtour", // "endtour" | "contact"
+  onSuccessNavigateTo = "/tours", // where to go after submit
+}) {
   const navigate = useNavigate();
 
   // video/audio
@@ -92,14 +95,19 @@ export default function EndTour() {
     }
 
     if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
-      alert("EmailJS is not configured. Check env vars and restart dev server.");
+      alert(
+        "EmailJS is not configured. Check env vars and restart dev server."
+      );
       return;
     }
 
     setSending(true);
 
     const templateParams = {
-      source: "City Whisperer Tour Feedback",
+      source:
+        mode === "contact"
+          ? "City Whisperer Contact Us"
+          : "City Whisperer Tour Feedback",
       rating: `${rating}/5`,
       name: cleanedName || "there",
       time: new Date().toLocaleString(),
@@ -129,7 +137,7 @@ export default function EndTour() {
       setRating(0);
       setHoverRating(0);
 
-      navigate("/tours");
+      navigate(onSuccessNavigateTo);
     } catch (err) {
       console.error("EmailJS error:", err);
       alert("Something went wrong sending your message. Please try again.");
@@ -165,12 +173,15 @@ export default function EndTour() {
             </div>
 
             <p className="text-xs text-gray-700 mt-2">
-              Note: If sound doesn’t start immediately, click once anywhere (browser autoplay rule).
+              Note: If sound doesn’t start immediately, click once anywhere
+              (browser autoplay rule).
             </p>
           </div>
 
           <p className="text-lg font-semibold mb-2 text-center">
-            Safe travels! Thank you for exploring with us ✨
+            {mode === "contact"
+              ? "Contact Us ✉️"
+              : "Safe travels! Thank you for exploring with us ✨"}
           </p>
 
           <div className="flex items-center justify-center mt-1 mb-2">
@@ -178,8 +189,9 @@ export default function EndTour() {
           </div>
 
           <div className="text-gray-600 text-xs mb-2 text-center">
-            <span>1 - Poor</span> | <span>2 - Fair</span> | <span>3 - Average</span> |{" "}
-            <span>4 - Very Good</span> | <span>5 - Excellent</span>
+            <span>1 - Poor</span> | <span>2 - Fair</span> |{" "}
+            <span>3 - Average</span> | <span>4 - Very Good</span> |{" "}
+            <span>5 - Excellent</span>
           </div>
 
           <input
@@ -201,7 +213,11 @@ export default function EndTour() {
             rows={5}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Write here to tell us what you liked and how we can improve."
+            placeholder={
+              mode === "contact"
+                ? "Write your message here — questions, issues, or ideas."
+                : "Write here to tell us what you liked and how we can improve."
+            }
             required
           />
 

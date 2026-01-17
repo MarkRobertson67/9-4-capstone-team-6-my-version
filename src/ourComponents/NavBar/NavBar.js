@@ -1,25 +1,32 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import logo from '../../assets/OfficialCityWhispererLogo.png';
-import { Spiral as Hamburger } from 'hamburger-react'
-import './NavBar.css';
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import logo from "../../assets/OfficialCityWhispererLogo.png";
+import { Spiral as Hamburger } from "hamburger-react";
+import "./NavBar.css";
 
 function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const loc = useLocation()
+  const loc = useLocation();
 
   const toggleMenu = () => {
-    setMenuOpen(menuOpen => !menuOpen);
+    setMenuOpen((menuOpen) => !menuOpen);
   };
 
   return (
-    <div className='mb-[-65px] navBar'>
+    <div className="mb-[-65px] navBar">
       <nav
-        className={loc.pathname !== '/' ? 'bg-[#fffffff6] fixed w-full z-20 top-0  left-0 border-b-0 border-gray-200 custom-border pb-0 pt-0 px-3 h-[12%] shadow-2xl' : 'bg-white bg-opacity-0 fixed w-full z-20 top-0 left-0 border-b-0 border-gray-200 custom-border pb-0 pt-0'}>
+        className={
+          loc.pathname !== "/"
+            ? "bg-[#fffffff6] fixed w-full z-20 top-0  left-0 border-b-0 border-gray-200 custom-border pb-0 pt-0 px-3 h-[12%] shadow-2xl"
+            : "bg-white bg-opacity-0 fixed w-full z-20 top-0 left-0 border-b-0 border-gray-200 custom-border pb-0 pt-0"
+        }
+      >
         <div className="flex flex-wrap items-center justify-between  mx-auto p-2 text-sky-950 ml-16 mr-16">
           <span className="logo ">
-            <a href="/" className="w-[172px] h-auto flex flex-col items-center"> {/* Use flex-col to stack items vertically */}
+            <a href="/" className="w-[172px] h-auto flex flex-col items-center">
+              {" "}
+              {/* Use flex-col to stack items vertically */}
               <img
                 src={logo}
                 className="mt-1.5 mr-3 w-[120%] h-[120%]  max-[760px]:w-[20%]  max-[760px]:h-[auto] left-[0px] drop-shadow-[2px_0px_5px_rgba(255,255,255,0.5)]"
@@ -29,24 +36,42 @@ function NavBar() {
             </a>
           </span>
 
-          <div className="flex md:order-2 ml-auto inline-flex text-xl font-bold">
+          <div className="flex md:order-2 ml-auto text-xl font-bold">
             {/* Desktop Menu & Tablet Menu */}
             <ul className="DESKTOP-MENU hidden space-x-8 md:flex lg:flex text-xxl">
               <li>
-                <a href="/" className="nav-link home text-sky-950 text-shadow-white drop-shadow-lg">
+                <a
+                  href="/"
+                  className="nav-link home text-sky-950 text-shadow-white drop-shadow-lg"
+                >
                   Home
                 </a>
               </li>
               <li>
-                <Link to="/about" className="nav-link about text-sky-950 text-shadow-white drop-shadow-lg">
+                <Link
+                  to="/about"
+                  className="nav-link about text-sky-950 text-shadow-white drop-shadow-lg"
+                >
                   About
                 </Link>
               </li>
               <li>
-                <Link to="/tours" className="nav-link browsetours text-sky-950 text-shadow-white drop-shadow-lg">
+                <Link
+                  to="/tours"
+                  className="nav-link browsetours text-sky-950 text-shadow-white drop-shadow-lg"
+                >
                   Browse Tours
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/contact"
+                  className="nav-link text-sky-950 text-shadow-white drop-shadow-lg"
+                >
+                  Contact
+                </Link>
+              </li>
+
               <li>
                 <Link
                   to="/createnewtour"
@@ -89,13 +114,15 @@ function NavBar() {
           </div>
           {/* Mobile Menu */}
           <div
-            className={`items-center justify-between w-full md:w-auto md:order-1 ${menuOpen ? 'block' : 'hidden'
-              } md:hidden`}
+            className={`items-center justify-between w-full md:w-auto md:order-1 ${
+              menuOpen ? "block" : "hidden"
+            } md:hidden`}
             id="navbar-sticky"
           >
             <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white">
               <li>
-                <a href="/"
+                <a
+                  href="/"
                   onClick={toggleMenu}
                   className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0"
                   aria-current="page"
@@ -130,11 +157,20 @@ function NavBar() {
                   Create New Tour
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/contact"
+                  onClick={toggleMenu}
+                  className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0"
+                >
+                  Contact
+                </Link>
+              </li>
             </ul>
           </div>
-        </div >
-      </nav >
-    </div >
+        </div>
+      </nav>
+    </div>
   );
 }
 
