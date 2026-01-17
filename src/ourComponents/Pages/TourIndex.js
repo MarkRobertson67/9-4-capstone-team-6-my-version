@@ -172,30 +172,37 @@ export default function TourIndex() {
       {/* Carousel wrapper MUST be relative so arrows position correctly */}
       <div className="relative max-w-7xl mx-auto mt-12 px-4 sm:px-6 lg:px-8">
         {/* Left arrow */}
-        <button
-          type="button"
-          onClick={() => scrollByCards(-1)}
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-30
-                     bg-white/80 hover:bg-white text-gray-900
-                     rounded-full w-12 h-12 shadow-lg
-                     flex items-center justify-center"
-          aria-label="Scroll left"
-        >
-          ‹
-        </button>
+<button
+  type="button"
+  onClick={() => scrollByCards(-1)}
+  className="
+    hidden lg:flex
+    absolute left-2 top-1/2 -translate-y-1/2 z-30
+    bg-white/80 hover:bg-white text-gray-900
+    rounded-full w-12 h-12 shadow-lg
+    items-center justify-center
+  "
+  aria-label="Scroll left"
+>
+  ‹
+</button>
 
-        {/* Right arrow */}
-        <button
-          type="button"
-          onClick={() => scrollByCards(1)}
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-30
-                     bg-white/80 hover:bg-white text-gray-900
-                     rounded-full w-12 h-12 shadow-lg
-                     flex items-center justify-center"
-          aria-label="Scroll right"
-        >
-          ›
-        </button>
+{/* Right arrow */}
+<button
+  type="button"
+  onClick={() => scrollByCards(1)}
+  className="
+    hidden lg:flex
+    absolute right-2 top-1/2 -translate-y-1/2 z-30
+    bg-white/80 hover:bg-white text-gray-900
+    rounded-full w-12 h-12 shadow-lg
+    items-center justify-center
+  "
+  aria-label="Scroll right"
+>
+  ›
+</button>
+
 
         {/* Responsive scroller: vertical on mobile, horizontal on lg+ */}
         <div
