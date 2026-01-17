@@ -143,9 +143,15 @@ export default function Tour() {
               {pointsOfInterest.length &&
                 allPointsOfInterest.length &&
                 pointsOfInterest.map((poi, index) => {
-                  const allPoi = allPointsOfInterest.find(
+                  const isLastPoi = index === pointsOfInterest.length - 1;
+
+                  const matches = allPointsOfInterest.filter(
                     (el) => el.poi_name === poi
                   );
+                  const allPoi = matches.length
+                    ? matches[Math.min(index, matches.length - 1)]
+                    : null;
+
                   if (!allPoi) return null;
 
                   return (
@@ -157,7 +163,17 @@ export default function Tour() {
                       setActiveMarker={setActiveMarker}
                       toggleModal={toggleModal}
                       setCurrentPoi={setCurrentPoi}
-                      setModalCommentary={setModalCommentary}
+                      setModalCommentary={(commentary) => {
+                        if (isLastPoi) {
+                          setModalCommentary(`You’re back where you started — tour complete!
+
+Thanks for exploring ${tour.city}. We hope you enjoyed this journey and discovered something new along the way.
+
+Want another adventure? Try a different theme or duration next!`);
+                        } else {
+                          setModalCommentary(commentary);
+                        }
+                      }}
                     />
                   );
                 })}
