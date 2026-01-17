@@ -12,8 +12,10 @@ const TEMPLATE_ID = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
 const PUBLIC_KEY = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
 
 export default function EndTour({
-  mode = "endtour", // "endtour" | "contact"
-  onSuccessNavigateTo = "/tours", // where to go after submit
+  mode = "endtour",
+  onSuccessNavigateTo = "/tours",
+  autoClose = false,
+  onClose = null,
 }) {
   const navigate = useNavigate();
 
@@ -113,7 +115,7 @@ export default function EndTour({
         mode === "contact"
           ? "City Whisperer Contact Us"
           : "City Whisperer Tour Feedback",
-      rating: `${rating}/5`,
+      rating: mode === "contact" ? "N/A" : `${rating}/5`,
       name: cleanedName || "there",
       time: new Date().toLocaleString(),
       email: cleanedEmail || "",
@@ -142,7 +144,11 @@ export default function EndTour({
       setRating(0);
       setHoverRating(0);
 
-      navigate(onSuccessNavigateTo);
+      if (autoClose && typeof onClose === "function") {
+        onClose();
+      } else {
+        navigate(onSuccessNavigateTo);
+      }
     } catch (err) {
       console.error("EmailJS error:", err);
       alert("Something went wrong sending your message. Please try again.");

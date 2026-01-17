@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-function Footer() {
+function Footer({ onContactClick }) {
   return (
     <footer className="bg-white dark:bg-gray-900">
       <div className="mx-auto w-full">
@@ -50,9 +50,13 @@ function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="hover:underline">
+                <button
+                  type="button"
+                  onClick={onContactClick}
+                  className="hover:underline"
+                >
                   Contact Us
-                </Link>
+                </button>
               </li>
             </ul>
           </div>

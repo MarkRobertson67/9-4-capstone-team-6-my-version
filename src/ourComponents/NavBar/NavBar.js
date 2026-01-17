@@ -4,7 +4,7 @@ import logo from "../../assets/OfficialCityWhispererLogo.png";
 import { Spiral as Hamburger } from "hamburger-react";
 import "./NavBar.css";
 
-function NavBar() {
+function NavBar({ onContactClick }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const loc = useLocation();
@@ -64,12 +64,16 @@ function NavBar() {
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/contact"
-                  className="nav-link text-sky-950 text-shadow-white drop-shadow-lg"
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false); // optional for mobile behavior; safe on desktop too
+                    onContactClick();
+                  }}
+                  className="nav-link text-sky-950 text-shadow-white drop-shadow-lg hover:underline"
                 >
-                  Contact
-                </Link>
+                  Contact Us
+                </button>
               </li>
 
               <li>
@@ -158,13 +162,16 @@ function NavBar() {
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/contact"
-                  onClick={toggleMenu}
-                  className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0"
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleMenu();
+                    onContactClick();
+                  }}
+                  className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 w-full text-left"
                 >
-                  Contact
-                </Link>
+                  Contact Us
+                </button>
               </li>
             </ul>
           </div>
