@@ -63,18 +63,6 @@ function NavBar({ onContactClick }) {
                   Browse Tours
                 </Link>
               </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen(false); // optional for mobile behavior; safe on desktop too
-                    onContactClick();
-                  }}
-                  className="nav-link text-sky-950 text-shadow-white drop-shadow-lg hover:underline"
-                >
-                  Contact Us
-                </button>
-              </li>
 
               <li>
                 <Link
@@ -160,18 +148,6 @@ function NavBar({ onContactClick }) {
                 >
                   Create New Tour
                 </Link>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => {
-                    toggleMenu();
-                    onContactClick();
-                  }}
-                  className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 w-full text-left"
-                >
-                  Contact Us
-                </button>
               </li>
             </ul>
           </div>
