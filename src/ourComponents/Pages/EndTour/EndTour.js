@@ -1,6 +1,6 @@
 // src/ourComponents/Pages/EndTour/EndTour.js
 import React, { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import emailjs from "@emailjs/browser";
 
 import AnimatedLogo from "../../../assets/City_Whisperer_Animation_LargeDashes.mp4";
@@ -78,6 +78,14 @@ export default function EndTour({
         onMouseLeave={() => setHoverRating(0)}
       />
     ));
+  };
+
+  const handleSkip = () => {
+    if (typeof onClose === "function") {
+      onClose(); // Contact Us modal → close only
+    } else {
+      navigate("/tours"); // End-of-tour page → navigate
+    }
   };
 
   const handleSubmit = async () => {
@@ -237,11 +245,13 @@ export default function EndTour({
           />
 
           <div className="flex justify-between items-center mt-4">
-            <Link to="/tours">
-              <button className="text-sm text-gray-700 underline" type="button">
-                Skip
-              </button>
-            </Link>
+            <button
+              type="button"
+              onClick={handleSkip}
+              className="text-sm text-gray-700 underline"
+            >
+              Skip
+            </button>
 
             <button
               type="button"
