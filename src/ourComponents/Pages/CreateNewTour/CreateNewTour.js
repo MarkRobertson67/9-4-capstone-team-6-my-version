@@ -222,7 +222,6 @@ export default function CreateNewTour() {
   const [isFetchingImage, setIsFetchingImage] = useState(false);
   const loadingSectionRef = useRef(null);
 
-
   useEffect(() => {
     if ((isLoading || isFetchingImage) && window.innerWidth < 1024) {
       setTimeout(() => {
@@ -627,12 +626,21 @@ export default function CreateNewTour() {
               >
                 {(isLoading || isFetchingImage) && (
                   <div className="flex flex-col items-center">
-                    <div className="rounded-md bg-yellow-100/90 border border-yellow-300 px-4 py-3 text-xs text-yellow-900 text-center animate-pulse max-w-md">
-                      ⏳ Please be patient while your tour is being created.
+                    <div className="rounded-md bg-yellow-100/90 border border-yellow-300 px-4 py-3 text-xs text-yellow-900 text-center animate-pulse opacity-95 max-w-md">
+                      ⏳{" "}
+                      <span className="font-semibold">
+                        Please be patient while your tour is being created.
+                      </span>
                       <br />
                       This process can take several minutes as we generate
                       <br />
                       the tour and detailed commentary for each stop.
+                      <br />
+                      <br />
+                      <span className="font-semibold text-red-700">
+                        ⚠️ Please do not refresh or navigate away — it will
+                        cancel tour creation.
+                      </span>
                     </div>
 
                     <img
